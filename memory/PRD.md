@@ -47,8 +47,8 @@ Brand: Outdooroots wordmark; Aventura · Vida · Naturaleza / En un nuevo viaje.
 - Iteration1:27 backend tests, initial smoke. Fixed ReportLab canvas error; rendering now uses supported wrapOn.
 - Iteration2:31 backend tests plus desktop/mobile full visitor→inquiry→admin workflow→quote→PDF. EN/ES state preservation,100-traveler zero-day group, destination reorder12days/11nights, filters/persistence, exact250EUR quote math, PDF privacy.
 - Iteration3:32 backend tests; actual70-day/30-experience and40-commercial-line one-page A4 stress/content/privacy tests; desktop/mobile contact form reveal. Production frontend build compiled successfully.
-- Final contact accessibility refinement removes tall sticky sidebar so the proposal button stays reachable with ordinary scrolling for all-five-region packages; focused native-click verification pending.
-- QA-only records cleaned by testing agents; historical and real user inquiries preserved. Regression tests under `backend/tests/`; reports `test_reports/iteration_1.json` through `iteration_3.json`.
+- Final contact accessibility refinement verified in iteration4: ordinary native clicks work for all-five-region proposals on desktop1920×800 and mobile390×844. Nonsticky sidebar avoids off-screen CTA trapping; contact form focuses the name field and lands below the fixed header.
+- QA-only records cleaned by testing agents; historical and real user inquiries preserved. Regression tests under `backend/tests/`; reports `test_reports/iteration_1.json` through `iteration_4.json`. No remaining reported functional bugs.
 - Test credentials remain unchanged in `/app/memory/test_credentials.md`.
 
 ## Operator inputs / limitations
