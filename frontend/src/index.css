@@ -92,3 +92,8 @@
         border-bottom-color: inherit;
     }
 }
+
+
+.eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: #A7613D; }
+.planning-note { padding: 12px 14px; background: #F6F2EB; border-left: 2px solid #C87D55; border-radius: 4px; font-size: 12px; line-height: 1.7; color: #5C656E; margin-bottom: 16px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }

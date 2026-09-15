@@ -5,7 +5,7 @@ import { IMAGES } from "@/data/destinations";
 const LINES = ["Chile, composed", "entirely around you."];
 
 const STATS = [
-  { value: "03", label: "Epic regions" },
+  { value: "05", label: "Epic regions" },
   { value: "100%", label: "Bespoke" },
   { value: "EUR", label: "Live pricing" },
 ];
@@ -64,7 +64,7 @@ export const Hero = () => {
           transition={{ delay: 0.85, duration: 0.8 }}
           className="mt-8 max-w-xl text-base sm:text-lg text-[#FDFBF7]/75 leading-relaxed"
         >
-          Patagonia's ice, the Atacama's stars, Santiago's tables — assemble your own
+          Patagonia's ice, the Atacama's stars, Santiago's tables, Rapa Nui's moai, and the Lake District's quiet shores — assemble your own
           expedition, watch the price take shape live, and let our team execute every detail.
         </motion.p>
 

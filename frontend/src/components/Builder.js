@@ -1,3 +1,4 @@
+import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { Share2, Download, Trash2, Sparkles, Send, Clock, Users } from "lucide-react";
@@ -10,6 +11,7 @@ import { DestinationPanel } from "@/components/builder/DestinationPanel";
 import { SidebarCard } from "@/components/builder/SidebarCard";
 import { ContactCard } from "@/components/builder/ContactCard";
 import { SummaryPanel } from "@/components/builder/SummaryPanel";
+import { ItineraryTimeline } from "@/components/builder/ItineraryTimeline";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -61,6 +63,30 @@ export const Builder = ({ builder }) => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast.success("Package exported", { description: "Your composition has been downloaded." });
+  };
+
+  const [exportingPdf, setExportingPdf] = useState(false);
+
+  const handlePdfExport = async () => {
+    if (!guardHasSelection()) return;
+    setExportingPdf(true);
+    try {
+      const { contact, ...snapshot } = buildPayload();
+      const { data } = await axios.post(`${API}/itinerary/pdf`, snapshot, { responseType: "blob" });
+      const url = URL.createObjectURL(data);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `chile-${snapshot.package_name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      toast.success("Your itinerary, to keep", { description: "A one-page PDF of your current composition has been downloaded." });
+    } catch {
+      toast.error("PDF couldn't be created", { description: "Your composition is safe. Please try downloading again." });
+    } finally {
+      setExportingPdf(false);
+    }
   };
 
   const handleReset = () => {

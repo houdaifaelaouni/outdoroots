@@ -56,6 +56,7 @@ export const SidebarCard = ({ builder }) => {
               id="package-name"
               value={packageName}
               onChange={(e) => setPackageName(e.target.value)}
+              maxLength={120}
               placeholder="My Chile Adventure"
               className="mt-1.5"
             />

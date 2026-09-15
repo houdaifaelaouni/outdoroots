@@ -17,7 +17,7 @@ export const Chapters = ({ onExplore }) => {
           The manifesto
         </p>
         <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.08] text-[#0B192C]">
-          Three chapters. One country. Infinite compositions.
+          Five chapters. One country. Infinite compositions.
         </h2>
       </motion.div>
 

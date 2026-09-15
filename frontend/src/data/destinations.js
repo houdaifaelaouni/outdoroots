@@ -1,4 +1,4 @@
-import { Mountain, Sun, Building2, Wine, Camera, Star, Users, Globe } from "lucide-react";
+import { Mountain, Sun, Building2, Wine, Camera, Star, Users, Globe, Waves, Trees } from "lucide-react";
 
 export const TAX_RATE = 0.19;
 
@@ -85,6 +85,57 @@ export const destinations = [
       { id: "lastarria", name: "Hotel Magnolia", price: 250, rating: 5, type: "Boutique Hotel" },
       { id: "w", name: "W Santiago", price: 220, rating: 4, type: "Modern Hotel" },
       { id: "cumbres", name: "Hotel Cumbres", price: 180, rating: 4, type: "Business Hotel" },
+    ],
+  },
+  {
+    id: "easter-island",
+    chapter: "04",
+    name: "Easter Island",
+    icon: Waves,
+    tagline: "An ocean apart",
+    description: "Ancient moai, volcanic shores, and Polynesian heritage",
+    longDescription:
+      "Far out in the Pacific, Rapa Nui keeps its own time. Meet the moai at first light, trace the rim of a volcanic crater with a local guide, and sink into the white sands of Anakena. Intimate island lodges offer a front-row seat to an ocean without an edge.",
+    basePrice: 280,
+    image: "/images/easter_island.jpg",
+    activities: [
+      { id: "tongariki-sunrise", name: "Ahu Tongariki Sunrise", price: 140, duration: 0.5, category: "Culture", icon: Sun },
+      { id: "rano-raraku", name: "Rano Raraku & Moai Heritage", price: 190, duration: 1, category: "Culture", icon: Globe },
+      { id: "orongo-crater", name: "Orongo & Rano Kau Crater", price: 130, duration: 0.5, category: "Nature", icon: Mountain },
+      { id: "anakena-beach", name: "Anakena Beach Picnic", price: 110, duration: 0.5, category: "Relaxation", icon: Waves },
+      { id: "rapa-nui-culture", name: "Rapa Nui Cultural Evening", price: 120, duration: 0.5, category: "Experience", icon: Star },
+      { id: "coastal-hike", name: "Private Coastal Hike", price: 180, duration: 1, category: "Adventure", icon: Users },
+    ],
+    accommodations: [
+      { id: "explora-rapa-nui", name: "Explora Rapa Nui", price: 580, rating: 5, type: "Island Lodge" },
+      { id: "nayara-hangaroa", name: "Nayara Hangaroa", price: 460, rating: 5, type: "Oceanfront Retreat" },
+      { id: "altiplanico-rapa-nui", name: "Altiplánico Rapa Nui", price: 290, rating: 4, type: "Boutique Lodge" },
+    ],
+  },
+  {
+    id: "lake-district",
+    chapter: "05",
+    name: "Lake District",
+    icon: Trees,
+    tagline: "A slower kind of wild",
+    description: "Mirror lakes, snow-capped volcanoes, and forest hideaways",
+    longDescription:
+      "South of the vineyards, Chile softens into ancient forest and deep, clear lakes. Paddle beneath Osorno's snowy cone, follow emerald waterfalls, and cross to Chiloé for timber churches and island kitchens. Settle into a lakeside retreat where the only agenda is the view.",
+    basePrice: 190,
+    image: "/images/lake_district.jpg",
+    activities: [
+      { id: "osorno-volcano", name: "Osorno Volcano Exploration", price: 160, duration: 1, category: "Adventure", icon: Mountain },
+      { id: "petrohue-falls", name: "Petrohué Waterfalls Walk", price: 90, duration: 0.5, category: "Nature", icon: Trees },
+      { id: "llanquihue-kayak", name: "Lake Llanquihue Kayaking", price: 120, duration: 0.5, category: "Adventure", icon: Waves },
+      { id: "chiloe-heritage", name: "Chiloé Island Heritage Tour", price: 210, duration: 1, category: "Culture", icon: Globe },
+      { id: "forest-hot-springs", name: "Forest Hot Springs Retreat", price: 140, duration: 0.5, category: "Relaxation", icon: Sun },
+      { id: "lakeside-tasting", name: "Lakeside Tasting Menu", price: 160, duration: 0.5, category: "Luxury", icon: Wine },
+    ],
+    accommodations: [
+      { id: "hotel-awa", name: "Hotel AWA", price: 380, rating: 5, type: "Lakeside Retreat" },
+      { id: "andbeyond-vira-vira", name: "andBeyond Vira Vira", price: 520, rating: 5, type: "Hacienda Lodge" },
+      { id: "futangue", name: "Futangue Hotel & Spa", price: 310, rating: 5, type: "Forest Lodge" },
+      { id: "tierra-chiloe", name: "Tierra Chiloé", price: 440, rating: 5, type: "Island Lodge" },
     ],
   },
 ];

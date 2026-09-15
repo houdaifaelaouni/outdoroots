@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/data/destinations";
+import { TeamWorkspace } from "@/components/TeamWorkspace";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const TOKEN_KEY = "ctb_admin_token";
@@ -48,9 +49,9 @@ function LoginForm({ onLogin }) {
     <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center px-4">
       <Card data-testid="admin-login-form" className="w-full max-w-md border-[#E6DFD5]">
         <CardHeader className="text-center">
-          <Mountain className="h-8 w-8 mx-auto text-[#0B192C] mb-2" />
+          <p className="font-serif text-2xl mb-3">Outdooroots</p>
           <CardTitle className="font-serif text-3xl">Team Console</CardTitle>
-          <CardDescription>Sign in to review incoming booking requests</CardDescription>
+          <CardDescription>Sign in to review inquiries and prepare proposals</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={submit} className="space-y-4">
@@ -221,64 +222,5 @@ export default function Admin() {
 
   if (!token) return <LoginForm onLogin={setToken} />;
 
-  const pending = (bookings || []).filter((b) => b.status === "pending").length;
-  const pipeline = (bookings || []).reduce((s, b) => s + (b.total_price || 0), 0);
-
-  return (
-    <div data-testid="admin-dashboard" className="min-h-screen bg-[#FDFBF7]">
-      <header className="bg-[#0B192C] text-[#FDFBF7]">
-        <div className="max-w-6xl mx-auto px-6 py-10 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#D4A373] mb-2">Team console</p>
-            <h1 className="font-serif text-4xl tracking-tight">Booking requests</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button data-testid="admin-refresh-button" variant="outline" size="sm" onClick={() => load(token)} className="bg-transparent border-[#FDFBF7]/30 text-[#FDFBF7] hover:bg-[#FDFBF7]/10 hover:text-white">
-              <RefreshCw className="h-4 w-4 mr-2" /> Refresh
-            </Button>
-            <Button data-testid="admin-logout-button" variant="outline" size="sm" onClick={logout} className="bg-transparent border-[#FDFBF7]/30 text-[#FDFBF7] hover:bg-[#FDFBF7]/10 hover:text-white">
-              <LogOut className="h-4 w-4 mr-2" /> Sign out
-            </Button>
-            <Link to="/" data-testid="admin-home-link">
-              <Button variant="outline" size="sm" className="bg-transparent border-[#FDFBF7]/30 text-[#FDFBF7] hover:bg-[#FDFBF7]/10 hover:text-white">
-                Builder →
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-6xl mx-auto px-6 py-10">
-        <div className="grid grid-cols-3 gap-4 mb-10">
-          {[
-            { label: "Requests", value: bookings?.length ?? "—", testid: "admin-stat-total" },
-            { label: "Pending", value: bookings ? pending : "—", testid: "admin-stat-pending" },
-            { label: "Pipeline value", value: bookings ? formatCurrency(pipeline) : "—", testid: "admin-stat-pipeline" },
-          ].map((s) => (
-            <Card key={s.label} className="border-[#E6DFD5]">
-              <CardContent className="py-5 text-center">
-                <div data-testid={s.testid} className="font-serif text-3xl text-[#0B192C]">{s.value}</div>
-                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">{s.label}</div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <div data-testid="admin-bookings-list" className="space-y-4">
-          {bookings === null && <p className="text-center text-muted-foreground py-16">Loading requests…</p>}
-          {bookings?.length === 0 && (
-            <Card className="border-dashed border-[#E6DFD5]">
-              <CardContent className="py-16 text-center">
-                <p className="font-serif text-2xl text-[#0B192C]">No requests yet</p>
-                <p className="text-sm text-muted-foreground mt-2">New booking submissions will appear here the moment they arrive.</p>
-              </CardContent>
-            </Card>
-          )}
-          {bookings?.map((b) => (
-            <BookingCard key={b.id} booking={b} onStatusChange={handleStatusChange} />
-          ))}
-        </div>
-      </main>
-    </div>
-  );
+  return <TeamWorkspace bookings={bookings} token={token} onReload={() => load(token)} onLogout={logout} />;
 }

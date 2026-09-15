@@ -1,8 +1,21 @@
 {
-  "project_name": "Chile Travel Builder - Bespoke Luxury Expedition Craftsman",
+  "project_name": "Outdooroots - Authentic Chile Expedition Platform",
+  "brand_identity": {
+    "name": "Outdooroots",
+    "logo_style": "Wordmark only ('Outdooroots'), no invented logos or unverified badges",
+    "subtitles": {
+      "en": "Adventure · Life · Nature",
+      "es": "Aventura · Vida · Naturaleza"
+    },
+    "taglines": {
+      "en": "On a new journey",
+      "es": "En un nuevo viaje"
+    },
+    "visual_tone": "Light-and-airy editorial presentation, elegant serif headings, deep blue accents, authentic destination photography, restrained motion. Premium presentation across all price points (not luxury-only)."
+  },
   "theme": {
     "mode": "light",
-    "style_archetype": "Organic Luxury & Editorial High-End Travel (Awwwards SOTD Level)",
+    "style_archetype": "Organic Editorial & High-End Expedition Travel",
     "color_palette": {
       "background": "#FDFBF7",
       "surface": "#F6F2EB",
@@ -10,14 +23,15 @@
       "primary_navy": "#0B192C",
       "accent_deep_blue": "#1E3E62",
       "accent_copper": "#C87D55",
-      "accent_ochre": "#D4A373",
+      "accent_sand": "#D4A373",
       "text_main": "#1A1A1A",
       "text_muted": "#5C656E",
       "border_subtle": "#E6DFD5",
       "border_active": "#1E3E62",
-      "card_bg": "#FFFFFF",
-      "badge_bg": "#EEFAF4",
-      "badge_text": "#0F5132"
+      "badge_success_bg": "#EEFAF4",
+      "badge_success_text": "#0F5132",
+      "badge_neutral_bg": "#F0F4F8",
+      "badge_neutral_text": "#1E3E62"
     },
     "css_variables": {
       "--background": "38 43% 98%",
@@ -42,90 +56,174 @@
     }
   },
   "typography": {
+    "tech_stack_note": "Frontend components are JavaScript (.js) files, not TypeScript (.tsx)",
     "fonts": {
       "heading": "'Cormorant Garamond', 'Playfair Display', Georgia, serif",
       "body": "'Plus Jakarta Sans', 'Outfit', sans-serif",
-      "mono_accent": "'JetBrains Mono', 'Source Code Pro', monospace"
+      "mono": "'JetBrains Mono', 'Source Code Pro', monospace"
     },
     "font_imports": [
       "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
     ],
     "scale": {
-      "hero_title": "text-4xl sm:text-6xl lg:text-7xl font-serif tracking-tight leading-[1.08]",
-      "section_heading": "text-3xl sm:text-4xl lg:text-5xl font-serif tracking-tight leading-tight",
+      "hero_title": "text-4xl sm:text-5xl lg:text-6xl font-serif tracking-tight leading-[1.1]",
+      "section_heading": "text-2xl sm:text-3xl lg:text-4xl font-serif tracking-tight leading-tight",
       "subsection_heading": "text-xl sm:text-2xl font-serif font-medium",
-      "card_title": "text-lg sm:text-xl font-sans font-semibold",
+      "card_title": "text-lg sm:text-xl font-sans font-semibold text-[#0B192C]",
       "body": "text-base font-sans leading-relaxed text-[#1A1A1A]",
       "small_label": "text-xs font-mono uppercase tracking-[0.2em] text-[#5C656E]",
       "price_tag": "text-lg sm:text-xl font-mono font-semibold text-[#0B192C]"
     }
   },
-  "motion_and_effects": {
-    "smooth_scroll": "Lenis smooth momentum scrolling setup in App root",
-    "hero_reveal": "Framer Motion line-by-line masked clip reveal with staggered fade in",
-    "marquee": "Slow editorial text ticker (30s infinite loop) with low contrast warm beige text",
-    "transitions": "transition-colors duration-200 ease-in-out, hover:-translate-y-0.5",
-    "hover_glow": "hover:shadow-xl hover:shadow-[#0B192C]/5 transition-all duration-300"
+  "i18n_and_currency": {
+    "languages": ["en", "es"],
+    "default_language": "en",
+    "currency": "EUR (€)",
+    "currency_rules": "All public traveler estimates are displayed in EUR (€). No automatic currency toggle on public screens. Team pipeline uses CLP internally for cost calculations and converts to EUR using dated rate."
   },
-  "layout_structure": [
+  "three_starting_signatures": [
     {
-      "section_id": "navbar",
-      "description": "Sticky glassmorphism header with logo, navigation anchors (Patagonia, Atacama, Santiago, Builder), Admin View toggle button, and Live EUR estimate summary badge.",
-      "styles": "backdrop-blur-md bg-[#FDFBF7]/85 border-b border-[#E6DFD5] sticky top-0 z-50"
+      "id": "patagonia-on-foot",
+      "title_en": "Patagonia on Foot",
+      "title_es": "Patagonia a Pie",
+      "focus": "Trekking, glaciers, and iconic granite horns in Torres del Paine",
+      "default_days": 6,
+      "badge": "Wilderness & Trekking"
     },
     {
-      "section_id": "hero",
-      "description": "Kinetic Hero with luxury glacier landscape background, line-by-line editorial reveal, key quick statistics (3 Epic Regions, 100% Bespoke, EUR Real-time engine), and direct scroll anchor to builder.",
-      "styles": "relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-[#0B192C] text-white"
+      "id": "atacama-under-the-stars",
+      "title_en": "Atacama Under the Stars",
+      "title_es": "Atacama Bajo las Estrellas",
+      "focus": "High-altitude salt flats, geysers, and celestial night skies",
+      "default_days": 4,
+      "badge": "Desert & Astronomy"
     },
     {
-      "section_id": "marquee_strip",
-      "description": "Slow editorial marquee ribbon displaying curated travel ethos: 'Torres del Paine • Atacama Stargazing • Private Valparaíso Wineries • Patagonian Ice Trekking • Bespoke Luxury Travel'",
-      "styles": "py-4 bg-[#F6F2EB] border-y border-[#E6DFD5] text-[#5C656E] font-mono text-sm tracking-widest overflow-hidden"
-    },
-    {
-      "section_id": "manifesto_chapters",
-      "description": "Numbered editorial chapters (01 Patagonia, 02 Atacama Desert, 03 Santiago & Central Chile) with arched image frames, spotlight highlights, and quick preview of featured activities.",
-      "styles": "py-20 px-6 max-w-7xl mx-auto space-y-24"
-    },
-    {
-      "section_id": "builder_container",
-      "description": "Main custom travel package builder section featuring Destination Tabs (Patagonia / Atacama / Santiago & Central Chile), Day steppers/sliders (0-14 days), Activity Selection Cards with EUR prices, Accommodation tier selector, and floating live EUR summary panel.",
-      "styles": "py-16 px-4 sm:px-8 max-w-7xl mx-auto bg-[#FDFBF7]"
-    },
-    {
-      "section_id": "booking_form_section",
-      "description": "Trip details & Contact info input section (Package Name, Dates, Traveler Count, Contact Info, Special Requests), along with primary Action Buttons (Submit for Booking, Share Package, Export JSON, Reset Builder, Load Sample).",
-      "styles": "mt-12 p-8 sm:p-12 rounded-xl bg-white border border-[#E6DFD5] shadow-sm"
-    },
-    {
-      "section_id": "admin_dashboard_modal",
-      "description": "Full-screen or dedicated view for travel agency team to manage incoming booking requests, filter by region/date/price, export data, and view itemized request details.",
-      "styles": "p-8 max-w-7xl mx-auto bg-white rounded-xl border border-[#E6DFD5]"
-    },
-    {
-      "section_id": "footer",
-      "description": "Deep navy editorial footer with massive branding type, copyright, emergency support, and brand links.",
-      "styles": "bg-[#0B192C] text-[#FDFBF7] py-20 px-8 mt-24"
+      "id": "lakes-forests-local-life",
+      "title_en": "Lakes, Forests & Local Life",
+      "title_es": "Lagos, Bosques y Vida Local",
+      "focus": "Volcano views, ancient temperate rainforests, and Chiloé folklore",
+      "default_days": 5,
+      "badge": "Culture & Nature"
     }
   ],
+  "progressive_practical_brief": {
+    "steps": [
+      {
+        "step": 1,
+        "name": "Trip Type & Purpose",
+        "fields": ["party_type (Independent, Guided, Family, Corporate/Group)", "special_goals"]
+      },
+      {
+        "step": 2,
+        "name": "Dates & Duration",
+        "fields": ["start_date", "is_flexible", "total_days", "party_size"]
+      },
+      {
+        "step": 3,
+        "name": "Budget & Comfort",
+        "fields": ["budget_basis (per_person | total_party)", "budget_eur", "comfort_level (Essential, Comfort, Premium, Signature)"]
+      },
+      {
+        "step": 4,
+        "name": "Interests & Pace",
+        "fields": ["interests (Trekking, Wildlife, Stargazing, Photography, Workation)", "pace (Relaxed, Moderate, Active)"]
+      },
+      {
+        "step": 5,
+        "name": "Practical Needs & Contact",
+        "fields": ["accessibility_needs", "dietary_requests", "full_name", "email", "phone", "notes"]
+      }
+    ]
+  },
+  "five_regions_editable_order": [
+    {
+      "id": "patagonia",
+      "chapter": "01",
+      "name_en": "Patagonia (Torres del Paine)",
+      "name_es": "Patagonia (Torres del Paine)",
+      "image": "https://images.unsplash.com/photo-1493724798364-c4ca5e3f5fd3?crop=entropy&cs=srgb&fm=jpg&q=85"
+    },
+    {
+      "id": "atacama",
+      "chapter": "02",
+      "name_en": "Atacama Desert",
+      "name_es": "Desierto de Atacama",
+      "image": "https://images.unsplash.com/photo-1580413193140-8af6ffa819e1?crop=entropy&cs=srgb&fm=jpg&q=85"
+    },
+    {
+      "id": "santiago",
+      "chapter": "03",
+      "name_en": "Santiago & Central Valleys",
+      "name_es": "Santiago y Valles Centrales",
+      "image": "https://images.unsplash.com/photo-1598202290788-28cabb2da6a7?crop=entropy&cs=srgb&fm=jpg&q=85"
+    },
+    {
+      "id": "easter-island",
+      "chapter": "04",
+      "name_en": "Easter Island (Rapa Nui)",
+      "name_es": "Isla de Pascua (Rapa Nui)",
+      "image": "https://images.unsplash.com/photo-1671155281453-b345a0a5922a?crop=entropy&cs=srgb&fm=jpg&q=85"
+    },
+    {
+      "id": "lake-district",
+      "chapter": "05",
+      "name_en": "Lake District & Chiloé",
+      "name_es": "Región de los Lagos y Chiloé",
+      "image": "https://images.unsplash.com/photo-1787525500105-e71a438ab8c6?crop=entropy&cs=srgb&fm=jpg&q=85"
+    }
+  ],
+  "commercial_pricing_rules": {
+    "calculation_basis": "Honest illustrative estimate with transparent per-item itemization.",
+    "rules": [
+      "Total nights = total days minus 1 (D - 1).",
+      "No blanket base fees or 19% automatic tax applied to public estimates.",
+      "Shared costs (transfers, private guides) billed per party, not multiplied per traveler.",
+      "Lodge accommodations and per-person activities billed per guest.",
+      "Complex custom or large group requests show 'Quote Required upon review'."
+    ]
+  },
+  "private_team_pipeline": {
+    "pipeline_stages": ["New", "Contacted", "Proposal sent", "Confirmed", "Lost", "Archived"],
+    "features": [
+      "Internal cost calculation in CLP with dated CLP/EUR FX conversion rate.",
+      "Configurable agency margin % and explicit tax fees.",
+      "Private margin and internal notes strictly stripped from public exports and PDFs.",
+      "Analytics dashboard with stage distribution, overdue follow-ups, conversion rate, and requested budget insights."
+    ]
+  },
+  "one_page_downloadable_summary": {
+    "format": "Typeset downloadable PDF summary / print view",
+    "required_sections": [
+      "Outdooroots Wordmark & Tagline ('Aventura · Vida · Naturaleza')",
+      "Traveler & Brief Overview (Name, Party Size, Dates, Experience Type)",
+      "Day-by-Day Timeline Digest with Regional Chapters",
+      "Itemized Commercial Summary (EUR)",
+      "Important Disclaimer: 'Illustrative proposal - subject to final team verification & availability'"
+    ]
+  },
   "image_urls": {
-    "hero_bg": "https://images.unsplash.com/photo-1546569397-ab326af881f5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MjJ8MHwxfHNlYXJjaHwxfHxwYXRhZ29uaWElMjBnbGFjaWVyJTIwbHV4dXJ5JTIwdHJhdmVsJTIwbGFuZHNjYXBlfGVufDB8fHx8MTc4OTQxMzgxN3ww&ixlib=rb-4.1.0&q=85",
-    "patagonia_chapter": "https://images.unsplash.com/photo-1493724798364-c4ca5e3f5fd3?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MjJ8MHwxfHNlYXJjaHw0fHxwYXRhZ29uaWElMjBnbGFjaWVyJTIwbHV4dXJ5JTIwdHJhdmVsJTIwbGFuZHNjYXBlfGVufDB8fHx8MTc4OTQxMzgxN3ww&ixlib=rb-4.1.0&q=85",
-    "atacama_chapter": "https://images.unsplash.com/photo-1580413193140-8af6ffa819e1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MjJ8MHwxfHNlYXJjaHw0fHxhdGFjYW1hJTIwZGVzZXJ0JTIwY2hpbGUlMjBzdGFyZ2F6aW5nJTIwcmVzb3J0fGVufDB8fHx8MTc4OTQxMzgxN3ww&ixlib=rb-4.1.0&q=85",
-    "santiago_chapter": "https://images.unsplash.com/photo-1598202290788-28cabb2da6a7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwzfHxzYW50aWFnbyUyMGNoaWxlJTIwd2luZXJ5JTIwbHV4dXJ5JTIwbGFuZHNjYXBlfGVufDB8fHx8MTc4OTQxMzgxN3ww&ixlib=rb-4.1.0&q=85",
-    "patagonia_glacier": "https://images.unsplash.com/photo-1552751753-0fc84ae5b6c8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MjJ8MHwxfHNlYXJjaHwyfHxwYXRhZ29uaWElMjBnbGFjaWVyJTIwbHV4dXJ5JTIwdHJhdmVsJTIwbGFuZHNjYXBlfGVufDB8fHx8MTc4OTQxMzgxN3ww&ixlib=rb-4.1.0&q=85",
-    "atacama_resort": "https://images.unsplash.com/photo-1648498015611-4e51d7d3f74a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHwzfHxhdGFjYW1hJTIwZGVzZXJ0JTIwY2hpbGUlMjBzdGFyZ2F6aW5nJTIwcmVzb3J0fGVufDB8fHx8MTc4OTQxMzgxN3ww&ixlib=rb-4.1.0&q=85",
-    "santiago_winery": "https://images.unsplash.com/photo-1564091482848-303acefe362e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwxfHxzYW50aWFnbyUyMGNoaWxlJTIwd2luZXJ5JTIwbHV4dXJ5JTIwbGFuZHNjYXBlfGVufDB8fHx8MTc4OTQxMzgxN3ww&ixlib=rb-4.1.0&q=85"
+    "hero_bg": "https://images.unsplash.com/photo-1546569397-ab326af881f5?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "patagonia_chapter": "https://images.unsplash.com/photo-1493724798364-c4ca5e3f5fd3?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "atacama_chapter": "https://images.unsplash.com/photo-1580413193140-8af6ffa819e1?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "santiago_chapter": "https://images.unsplash.com/photo-1598202290788-28cabb2da6a7?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "easter_island_chapter": "https://images.unsplash.com/photo-1671155281453-b345a0a5922a?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "lake_district_chapter": "https://images.unsplash.com/photo-1787525500105-e71a438ab8c6?crop=entropy&cs=srgb&fm=jpg&q=85"
   },
   "instructions_to_main_agent": [
-    "Ensure all interactive components (tabs, buttons, inputs, sliders, cards, checkboxes) contain 'data-testid' attributes (e.g., data-testid='destination-tab-patagonia', data-testid='submit-booking-button', data-testid='grand-total-display').",
-    "Keep currency strictly in EUR (€). Display live breakdown subtotals, accommodation costs, activity additions, estimated taxes (19%), and final grand total.",
-    "Inject google font links for Cormorant Garamond, Plus Jakarta Sans, and JetBrains Mono into public/index.html or import in index.css.",
-    "Implement Lenis smooth scrolling or Framer Motion scroll triggers for buttery motion.",
-    "Use Shadcn UI components for Popovers, Calendar, Select, Dialogs, Toasts (sonner), and Tabs, but style them with warm luxury neutrals and dark navy accents.",
-    "Provide a full-stack experience where submitted packages persist to backend storage or local persistent DB, and can be viewed/managed in the Team Admin View.",
-    "Ensure 'Load Sample' button fills realistic sample itinerary data for quick testing.",
-    "Include 'Export JSON', 'Share Package', 'Reset Builder' buttons with interactive feedback via Sonner toasts."
+    "Verify all React components use JavaScript (.js) files.",
+    "Ensure language toggle switches smoothly between English (en) and Spanish (es) without resetting builder state.",
+    "Implement the three signature starting paths in Home.js / Builder.js.",
+    "Maintain the progressive brief modal/form with responsive mobile support.",
+    "Render day-by-day timeline with duration checks, activity slots, and downtime indicators.",
+    "Implement downloadable one-page PDF summary and team inquiry pipeline in Admin.js.",
+    "Add data-testid attributes to all buttons, inputs, tabs, cards, and interactive elements."
+  ],
+  "GENERAL UI UX DESIGN GUIDELINES": [
+    "Maintain strict optical alignment and generous vertical padding (p-6, p-8, p-12).",
+    "Ensure high contrast compliance on light warm background (#FDFBF7) with deep navy text (#0B192C) and dark muted gray (#5C656E).",
+    "All interactive elements must have visible focus, hover, and press states with smooth CSS transitions.",
+    "Never rely on complete transparent backgrounds for headers or overlays that have content scrolling beneath them. Use backdrop-blur with semi-opaque background (e.g., bg-[#FDFBF7]/90 backdrop-blur-md).",
+    "All interactive and key informational elements MUST include a data-testid attribute in kebab-case (e.g. data-testid='signature-card-patagonia', data-testid='language-toggle-es', data-testid='export-pdf-button')."
   ]
 }

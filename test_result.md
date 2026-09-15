@@ -101,3 +101,45 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: Outdooroots approved revision; full acceptance scope in /app/memory/OUTDOOROOTS_PLAN.md. No emails/payments/inventory. Restore prior interrupted work and preserve old inquiries.
+backend:
+  - task: Inquiry restoration and brief persistence
+    implemented: true
+    working: NA
+    file: /app/backend/server.py
+    needs_retesting: true
+  - task: Protected inquiry workflow and CLP reviewed quotes
+    implemented: true
+    working: NA
+    file: /app/backend/inquiry_models.py
+    needs_retesting: true
+  - task: One-page bilingual visitor and reviewed proposal PDFs
+    implemented: true
+    working: NA
+    file: /app/backend/itinerary_pdf.py
+    needs_retesting: true
+frontend:
+  - task: Outdooroots bilingual starts, signatures, brief, five-region designer, timeline, estimates and submission reference
+    implemented: true
+    working: NA
+    file: /app/frontend/src/components/OutdoorootsBuilder.js
+    needs_retesting: true
+  - task: Team filters, followup, quote editor and activity-based analytics
+    implemented: true
+    working: NA
+    file: /app/frontend/src/components/TeamWorkspace.js
+    needs_retesting: true
+metadata:
+  created_by: main_agent
+  version: '2.0'
+  test_sequence: 1
+  run_ui: true
+test_plan:
+  current_focus: [bilingual_visitor, nights_order_pricing, inquiry_persistence, reviewed_quotes, pdf_privacy, team_pipeline, responsive]
+  stuck_tasks: []
+  test_all: true
+  test_priority: high_first
+agent_communication:
+  - agent: main
+    message: Backend dependency restored, all approved feature components implemented. One smoke screenshot passed. No email integration/config added. Existing auth is Bearer localStorage (not cookies); use memory/test_credentials.md. Please test full approved plan, create pytest regression tests, validate PDFs as one page and no private data, clean only your own QA-created records after testing. Earlier legacy components remain unused but not part of active visitor route.

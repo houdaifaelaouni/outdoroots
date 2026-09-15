@@ -204,6 +204,7 @@ export const DestinationPanel = ({ dest, selected, nights, travelers, onDaysChan
                   {selected.accommodation === "custom" && (
                     <Input
                       data-testid={`custom-accommodation-${dest.id}`}
+                      maxLength={160}
                       placeholder="Enter accommodation name"
                       value={selected.customAccommodation}
                       onChange={(e) => onCustomAccommodation(dest.id, e.target.value)}

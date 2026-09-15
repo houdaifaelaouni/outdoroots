@@ -3,10 +3,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import Home from "@/pages/Home";
 import Admin from "@/pages/Admin";
+import { LocaleProvider } from "@/hooks/useLocale";
 
 function App() {
   return (
-    <div className="App">
+    <LocaleProvider><div className="App">
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -14,7 +15,7 @@ function App() {
         </Routes>
       </BrowserRouter>
       <Toaster position="top-center" richColors />
-    </div>
+    </div></LocaleProvider>
   );
 }
 

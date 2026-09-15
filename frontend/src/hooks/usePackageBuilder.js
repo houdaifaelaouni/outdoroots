@@ -1,10 +1,13 @@
 import { useState, useMemo, useCallback } from "react";
+import { format } from "date-fns";
+import { composeItinerary } from "@/lib/itinerary";
+import { useLocale } from "@/hooks/useLocale";
+import { activityName, regionName } from "@/data/outdooroots";
 import {
   destinations,
   getDestinationById,
   getActivityById,
   getAccommodationById,
-  TAX_RATE,
 } from "@/data/destinations";
 
 const emptySelection = () =>
@@ -19,6 +22,9 @@ const emptySelection = () =>
 const emptyContact = { name: "", email: "", phone: "", notes: "" };
 
 export function usePackageBuilder() {
+  const { language } = useLocale();
+  const initialBrief = { trip_type: "personal", organization: "", flexible_window: "", desired_duration: null, party_composition: "", budget: null, budget_basis: "per_person", interests: [], pace: "balanced", experience: "", comfort: "", accessibility: "", goals: "", requirements: "", source: new URLSearchParams(window.location.search).get("ref")?.slice(0, 200) || "direct" };
+  const [brief, setBrief] = useState(initialBrief);
   const [activeTab, setActiveTab] = useState("patagonia");
   const [packageName, setPackageName] = useState("");
   const [travelers, setTravelers] = useState(2);
@@ -32,43 +38,45 @@ export function usePackageBuilder() {
     () =>
       selectedDestinations
         .filter((d) => d.days > 0)
-        .map((dest) => {
+        .map((dest, index, active) => {
           const destination = getDestinationById(dest.id);
-          const nights = Math.max(0, dest.days - 1);
+          const nights = Math.max(0, dest.days - (index === active.length - 1 ? 1 : 0));
           const accommodation =
             dest.accommodation && dest.accommodation !== "custom"
               ? getAccommodationById(dest.id, dest.accommodation)
               : null;
           const activities = dest.activities
             .map((aid) => getActivityById(dest.id, aid))
-            .filter(Boolean);
-          const baseCost = destination.basePrice * dest.days * travelers;
-          const activitiesCost = activities.reduce((s, a) => s + a.price * travelers, 0);
-          const accommodationCost = accommodation
+            .filter(Boolean)
+            .map((a) => ({ ...a, name: activityName(dest.id, a, language), basis: a.id === "private-guide" ? "group" : "person" }));
+          const activitiesCost = brief.trip_type === "group" ? 0 : activities.reduce((s, a) => s + (a.price ?? 0) * (a.basis === "group" ? 1 : travelers), 0);
+          const accommodationCost = accommodation && brief.trip_type !== "group"
             ? accommodation.price * nights * travelers
             : 0;
           return {
             id: dest.id,
-            name: destination.name,
+            name: regionName(destination.id, language),
             days: dest.days,
             nights,
             activities,
             accommodation,
             customAccommodation: dest.customAccommodation,
-            baseCost,
             activitiesCost,
             accommodationCost,
-            subtotal: baseCost + activitiesCost + accommodationCost,
+            subtotal: activitiesCost + accommodationCost,
           };
         }),
-    [selectedDestinations, travelers]
+    [selectedDestinations, travelers, language, brief.trip_type]
   );
 
   const subtotal = breakdown.reduce((s, b) => s + b.subtotal, 0);
-  const tax = Math.round(subtotal * TAX_RATE);
+  const tax = 0;
   const grandTotal = subtotal + tax;
   const totalDays = selectedDestinations.reduce((s, d) => s + d.days, 0);
-  const totalActivities = selectedDestinations.reduce((s, d) => s + d.activities.length, 0);
+  const totalActivities = breakdown.reduce((s, d) => s + d.activities.length, 0);
+  const itinerary = useMemo(() => composeItinerary(breakdown, startDate), [breakdown, startDate]);
+  const dateMismatch = Boolean(endDate && itinerary.days.length && startDate &&
+    format(endDate, "yyyy-MM-dd") !== itinerary.days[itinerary.days.length - 1].date);
 
   const handleDaysChange = useCallback((destId, days) => {
     setSelectedDestinations((prev) =>
@@ -106,13 +114,22 @@ export function usePackageBuilder() {
     );
   }, []);
 
-  const getNights = useCallback(
-    (destId) => {
-      const dest = selectedDestinations.find((d) => d.id === destId);
-      return dest ? Math.max(0, dest.days - 1) : 0;
-    },
-    [selectedDestinations]
-  );
+  const getNights = useCallback((destId) => breakdown.find((d) => d.id === destId)?.nights || 0, [breakdown]);
+  const moveDestination = (id, direction) => setSelectedDestinations((prev) => {
+    const next = [...prev];
+    const index = next.findIndex((d) => d.id === id);
+    const target = index + direction;
+    if (target < 0 || target >= next.length) return prev;
+    [next[index], next[target]] = [next[target], next[index]];
+    return next;
+  });
+  const loadSignature = (signature) => {
+    setPackageName(signature.title[language === "es" ? 1 : 0]);
+    setBrief((prev) => ({ ...prev, trip_type: "personal" }));
+    setTravelers((prev) => Math.min(30, prev));
+    setSelectedDestinations(emptySelection().map((d) => d.id === signature.id ? { ...d, days: signature.days, activities: signature.activities } : d));
+    setActiveTab(signature.id);
+  };
 
   const reset = useCallback(() => {
     setPackageName("");
@@ -125,7 +142,8 @@ export function usePackageBuilder() {
   }, []);
 
   const loadSample = useCallback(() => {
-    setPackageName("Premium Chile Experience");
+    setPackageName("Outdooroots · Five chapters");
+    setBrief((prev) => ({ ...prev, trip_type: "personal" }));
     setTravelers(2);
     setSelectedDestinations([
       {
@@ -149,15 +167,33 @@ export function usePackageBuilder() {
         accommodation: "singular-santiago",
         customAccommodation: "",
       },
+      {
+        id: "easter-island",
+        days: 4,
+        activities: ["tongariki-sunrise", "rano-raraku", "anakena-beach"],
+        accommodation: "explora-rapa-nui",
+        customAccommodation: "",
+      },
+      {
+        id: "lake-district",
+        days: 3,
+        activities: ["osorno-volcano", "petrohue-falls", "llanquihue-kayak"],
+        accommodation: "hotel-awa",
+        customAccommodation: "",
+      },
     ]);
   }, []);
 
   const buildPayload = useCallback(
     () => ({
-      package_name: packageName || `Custom Chile Package — ${totalDays} Days`,
+      package_name: packageName || (language === "es" ? "Mi aventura Outdooroots" : "My Outdooroots adventure"),
+      language,
+      brief,
       travelers,
-      start_date: startDate ? startDate.toISOString() : null,
-      end_date: endDate ? endDate.toISOString() : null,
+      start_date: startDate ? format(startDate, "yyyy-MM-dd") : null,
+      end_date: endDate ? format(endDate, "yyyy-MM-dd") : null,
+      itinerary: itinerary.days,
+      unscheduled_activities: itinerary.unscheduled,
       total_days: totalDays,
       subtotal,
       tax,
@@ -168,16 +204,17 @@ export function usePackageBuilder() {
         days: b.days,
         accommodation:
           b.accommodation?.name ||
-          (b.customAccommodation ? `Custom: ${b.customAccommodation}` : "Not selected"),
+          (b.customAccommodation ? b.customAccommodation : (language === "es" ? "Estadía por definir · cotización requerida" : "Stay to be arranged · quote required")),
         activities: b.activities.map((a) => a.name),
         subtotal: b.subtotal,
       })),
       contact: contactInfo,
     }),
-    [packageName, travelers, startDate, endDate, totalDays, subtotal, tax, grandTotal, breakdown, contactInfo]
+    [packageName, travelers, startDate, endDate, totalDays, subtotal, tax, grandTotal, breakdown, contactInfo, itinerary, brief, language]
   );
 
   return {
+    brief, setBrief, moveDestination, loadSignature,
     activeTab,
     setActiveTab,
     packageName,
@@ -198,6 +235,8 @@ export function usePackageBuilder() {
     tax,
     grandTotal,
     totalDays,
+    itinerary,
+    dateMismatch,
     totalActivities,
     handleDaysChange,
     handleActivityToggle,

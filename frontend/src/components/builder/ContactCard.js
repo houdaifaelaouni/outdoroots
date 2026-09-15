@@ -10,7 +10,7 @@ const FIELDS = [
 ];
 
 export const ContactCard = ({ contactInfo, setContactInfo }) => (
-  <Card data-testid="contact-info-card" className="border-[#E6DFD5]">
+  <Card id="booking-contact" data-testid="contact-info-card" className="border-[#E6DFD5] scroll-mt-24">
     <CardHeader>
       <CardTitle className="font-serif text-xl">Correspondence</CardTitle>
       <CardDescription>Where our team reaches you</CardDescription>
