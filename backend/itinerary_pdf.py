@@ -57,11 +57,11 @@ def render_itinerary_pdf(package, reviewed=None, language="en"):
         content += [paragraph(heading, 15, "Times-Roman", NAVY), Spacer(1, 3)]
         nights = count - (1 if offset + count == package.total_days else 0)
         content.append(paragraph(f"{'Estadía propuesta' if es else 'Proposed stay'}: {escape(short(destination.accommodation, 80))} · {nights} {'noches' if es else 'nights'}", 8))
-        highlights = destination.activities[:2] if reviewed or len(package.destinations) > 3 else destination.activities[:3]
-        activities = escape(short(" · ".join(highlights), 140))
+        highlights = destination.activities[:1] if reviewed else destination.activities[:2] if len(package.destinations) > 3 else destination.activities[:3]
+        activities = escape(short(" · ".join(highlights), 80 if reviewed else 140))
         more = len(destination.activities) - len(highlights)
         if more:
-            activities += f" · +{more} {'experiencias; detalle en plataforma' if es else 'experiences; full detail on platform'}"
+            activities += f" · +{more} {'experiencias' if es else 'experiences'}"
         content.append(paragraph(activities or ("Tiempo libre; experiencias por definir" if es else "Open time; experiences to be discussed"), 8.5))
         content.append(Spacer(1, 12))
         offset += count
@@ -87,9 +87,9 @@ def render_itinerary_pdf(package, reviewed=None, language="en"):
             for line in lines:
                 category = line.get("category", "other")
                 groups[category] = groups.get(category, 0) + line["total_eur"]
-            labels = {"accommodation": "Alojamientos", "experience": "Experiencias", "guide": "Guías", "transport": "Transporte", "other": "Otros servicios"}
+            labels = {"accommodation": "Alojamientos", "experience": "Experiencias", "guide": "Guías", "transport": "Transporte", "other": "Otros servicios"} if es else {"accommodation": "Accommodation", "experience": "Experiences", "guide": "Guides", "transport": "Transport", "other": "Other services"}
             for category, total in groups.items():
-                content.append(paragraph(f"{escape(labels[category] if es else category.title())}: €{total:,.2f}", 8))
+                content.append(paragraph(f"{escape(labels[category])}: €{total:,.2f}", 8))
         else:
             for line in lines:
                 basis = {"person": "persona", "group": "grupo", "room_night": "habitación/noche", "person_night": "persona/noche", "day": "día", "item": "unidad"}.get(line["basis"], line["basis"]) if es else line["basis"].replace("_", " ")
@@ -100,7 +100,7 @@ def render_itinerary_pdf(package, reviewed=None, language="en"):
             content.append(paragraph(f"{escape(reviewed['service_label'])}: €{reviewed['service_eur']:,.2f}", 8))
         content.append(paragraph(f"{'Cambio aprobado' if es else 'Approved conversion'}: 1 EUR = {reviewed['clp_per_eur']:g} CLP · {reviewed['exchange_rate_date']}", 7.5))
         if reviewed.get("outstanding_checks"):
-            items.append(reviewed["outstanding_checks"])
+            items.append(short(reviewed["outstanding_checks"], 220))
         content.append(Spacer(1, 8))
     content += [paragraph("POR REVISAR" if es else "PLANNING NOTES", 8, "Helvetica-Bold", COPPER), Spacer(1, 4), paragraph(escape(" ".join(items)), 8)]
     body = KeepInFrame(width - 80, 390, content, mode="shrink")
@@ -122,8 +122,8 @@ def render_itinerary_pdf(package, reviewed=None, language="en"):
         pdf.drawRightString(width - 55, 159, f"€{amount / package.travelers:,.0f} / {'persona' if es else 'person'}")
     note = (f"{'Válida hasta' if es else 'Valid until'} {reviewed['valid_until']}" if reviewed else ("Tarifas de ejemplo, no aprobadas. Los importes faltantes requieren cotización." if es else "Sample rates, not approved. Missing costs require a quote."))
     pdf.drawString(55, 129, note)
-    footer_text = (reviewed.get("inclusions", "") + " | " + reviewed.get("exclusions", "")) if reviewed else ("Incluye solo experiencias y noches con precio de ejemplo. Excluye vuelos, traslados y conceptos sin precio. Sin impuestos ni cargos no configurados." if es else "Includes sample-priced experiences and stays only. Excludes flights, transfers and unpriced items. No unconfigured tax or fees applied.")
-    foot = KeepInFrame(width - 80, 50, [paragraph(escape(footer_text), 7.5), paragraph("En un nuevo viaje · Outdooroots", 8, "Times-Italic", COPPER)], mode="shrink")
+    footer_text = (("Incluye: " if es else "Includes: ") + short(reviewed.get("inclusions", ""), 160) + (" | Excluye: " if es else " | Excludes: ") + short(reviewed.get("exclusions", ""), 160)) if reviewed else ("Incluye solo experiencias y noches con precio de ejemplo. Excluye vuelos, traslados y conceptos sin precio. Sin impuestos ni cargos no configurados." if es else "Includes sample-priced experiences and stays only. Excludes flights, transfers and unpriced items. No unconfigured tax or fees applied.")
+    foot = KeepInFrame(width - 80, 50, [paragraph(escape(footer_text), 7.5), paragraph("Resumen de una página; itinerario completo en la plataforma. · Outdooroots" if es else "One-page summary; full daily itinerary on the platform. · Outdooroots", 8, "Times-Italic", COPPER)], mode="shrink")
     _, foot_h = foot.wrapOn(pdf, width - 80, 50)
     foot.drawOn(pdf, 40, 94 - foot_h)
     pdf.showPage()

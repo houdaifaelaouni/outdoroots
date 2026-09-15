@@ -1,0 +1,38 @@
+{
+  "summary": "Full desktop + mobile E2E frontend regression plus backend regression. Backend 31/31 pytest pass (27 pre-existing + 4 new pypdf content/privacy/one-page A4 checks) including the KeepInFrame wrapOn fix, group PDF says 'Quote required' (never €0), reviewed proposal PDF privacy verified. Desktop signature flow: chose Patagonia signature -> filled 3-step brief (interests trekking+nature, pace active, comfort comfortable, requirements) -> route designer with all 5 chapters -> added Easter Island +3 days, Lake District +3 days -> reordered Lake District up -> got 12 days / 11 nights (correct nights=days-1) -> chronological timeline (D1-6 Patagonia -> D7-9 Lake District -> D10-12 Easter Island) with correct dates, Rapa Nui review notice, transfer review between regions, illustrative estimate €900 (2 travelers), per-person €450, EN/ES language toggle preserved EUR and selections, downloaded real one-page PDF (3176 bytes), submitted proposal contact form -> got reference OR-20260915-DC3AE7C9 (personal). Group flow start-group with 100 travelers, org QA_Group_Org, EUR 50000 total budget, requirements+goals, zero regions -> Grand total UI shows 'Quote required' (not €0), nav header shows 'EUR · Quote required', group PDF downloaded (2723 bytes) contains 'Quote required'. Submitted -> ref OR-20260915-237AC987 (group). Admin login (admin@chiletravel.com / Patagonia!2026) succeeded, search filtered to the new personal inquiry (1 match), expanded review workspace, saved workflow: stage->contacted, internal_notes, next_action, follow_up_date 2024-01-15 (past date accepted, no client-side block). Filled QuoteEditor via UI: added a line then removed it back, filled description/category=guide/basis=group/qty=2/cost_clp=100000/margin=20 (selling blank), FX=1000 today, valid_until +30d, inclusions/exclusions/outstanding checks, checked approved -> Save -> quote-total UI shows exactly '€250.00 · valid to 2026-10-15'. Downloaded reviewed PDF via UI (2967 bytes) - pypdf extraction confirms: 1 page, 595x842 A4, 'REVIEWED PROPOSAL · EUR €250.00', '€125 / person', 'Valid until 2026-10-15', inclusions 'Guide, entrance fees, water', exclusions 'Flights, personal insurance', 'Confirm hut availability', header 'PROPOSAL, NOT RESERVATION'. Privacy verified: no 'internal notes'/'QA private note'/'supplier'/'100000'/'100,000'/margin percentage/cost breakdown appear in text. Advanced to confirmed -> persisted after refresh (stage 'confirmed'). Analytics react correctly: 27 Inquiries, Confirmed quote value €250. Lost-reason UI shows textarea; server-side gate confirmed by pytest test_patch_lost_requires_reason. Mobile 390x844 smoke: no horizontal overflow on home, builder, or route designer; language toggle + all 3 start entries + all 5 chapter tiles + days-plus/move-down route controls visible.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "OutdoorootsBuilder desktop", "issues": ["submit-booking-button was momentarily below the fold at 1080p when the contact form is first opened; scroll-into-view works but a scrollIntoView call after form reveal would smooth the interaction. Not a blocker."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_outdooroots_api.py",
+    "/app/backend/tests/test_pdf_content.py",
+    "/app/backend/tests/conftest.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py still uses deprecated @app.on_event('startup'/'shutdown'); migrate to lifespan.",
+    "PackageSnapshot.validate_schedule now also validates day.destination name and day.accommodation label alignment (good) — the client passes these consistently in practice.",
+    "InquiryUpdate.follow_up_date is a `date`, stored via model_dump(mode='json') as isoformat; Admin form re-populates it from the string field - OK.",
+    "CORS_ORIGINS default still '*' with allow_credentials=True — set explicit origins in prod.",
+    "Reviewed PDF category groups use raw `category.title()` for the EN label when >5 lines (line 92 of itinerary_pdf.py) — consider English human labels analogous to the Spanish `labels` dict for consistency."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_pdf_content.py"
+  ],
+  "success_rate": {"backend": "100% (31/31)", "frontend": "100% desktop + mobile flows exercised"},
+  "test_credentials": "admin@chiletravel.com / Patagonia!2026 (unchanged; /app/memory/test_credentials.md).",
+  "seed_data_creation": "Created 2 UI inquiries this run: OR-20260915-DC3AE7C9 (personal, qa-ui-personal@outdooroots.example.com, advanced to 'confirmed' with reviewed quote €250) and OR-20260915-237AC987 (group, qa-ui-group@outdooroots.example.com). Pytest also created transient QA bookings. All QA data purged post-test via Mongo `delete_many({contact.email: /@outdooroots.example.com$/})` -> removed 22 bookings; 5 legitimate/historical inquiries remain untouched. Admin auth credentials not modified.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Backend: `cd /app/backend && python -m pytest tests/ -v` covers 31 tests (health/auth/PDF/booking lifecycle/admin workflow/reviewed quote math+rejections/proposal PDF gating/PDF content+privacy+A4+one-page). Frontend testids for full flow are documented in the task; the RouteDesigner tabs testid is `destination-tab-{id}` (not choose-signature which is only on landing signature cards), reorder uses `move-up/down-{id}`, days ±: `days-plus/minus-{id}`, empty region CTA `quick-add-{id}`. Language toggle is `language-toggle-en/es`. Admin quote save then PDF at `quote-pdf-{id}`. When submitting contact form, scroll_into_view the submit button as it can be below the fold. Clean QA data via Mongo emails matching @outdooroots.example.com.",
+  "rca of the issue": "N/A — no new critical issues found. The prior KeepInFrame.canv workaround has been replaced with proper wrapOn() and both pytest and pypdf-based content extraction confirm PDFs render cleanly on A4 with 1 page even under the max 70-day / 30-experience payloads. Reviewed proposal PDFs are privacy-safe: internal notes, supplier CLP costs, and margin data never leak into the customer-facing document."
+}
