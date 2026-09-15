@@ -102,6 +102,9 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
+final_native_click_check: Last UI refinement removes sidebar sticky positioning entirely, so native request-proposal clicks on a five-region long itinerary do not require programmatic dispatch or force. Added scroll-mt-24 to contact form to respect fixed header. Verify only this on desktop/mobile, no backend or data mutation.
+
+
 final_regression_scope: Iteration2 full E2E and31 API checks passed. Final narrow changes remove sticky aside while contact form is open and scroll/focus first field; reviewed PDFs use human category labels and bounded highlights/summary notes for readability. Verify these plus actual70-day and40-line reviewed one-page PDF content, no broad full regression needed.
 
 
