@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BriefField, BriefSelect } from "@/components/builder/AdventureBrief";
-import { formatCurrency } from "@/data/destinations";
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const blankLine = () => ({ description: "", category: "experience", basis: "person", quantity: 1, cost_clp: "", selling_clp: "", margin_percent: "" });
 export const QuoteEditor = ({ inquiry, token, onSaved }) => {
@@ -35,6 +34,6 @@ export const QuoteEditor = ({ inquiry, token, onSaved }) => {
     <p className="text-xs text-[#5C656E]">No live exchange feed or default rate. Configured tax is calculated on selling subtotal plus service fee; use only when this treatment is appropriate.</p>
     {[["inclusions", "Customer-facing inclusions"], ["exclusions", "Customer-facing exclusions"], ["outstanding_checks", "Customer-facing outstanding availability / cost checks"]].map(([key, label]) => <BriefField key={key} id={`quote-${key}-${id}`} label={label}><Textarea data-testid={`quote-${key}-${id}`} id={`quote-${key}-${id}`} required={key !== "outstanding_checks"} maxLength={1000} value={quote[key]} onChange={(e) => update(key, e.target.value)} /></BriefField>)}
     <label className="flex gap-3 items-start text-xs"><Checkbox data-testid={`quote-approved-${id}`} checked={approved} onCheckedChange={setApproved} /><span>I have reviewed the costs, quantities, inclusions, exchange rate, tax treatment and quote validity.</span></label>
-    <div className="flex flex-wrap gap-3 items-center"><Button data-testid={`quote-save-${id}`} disabled={!approved || busy} type="submit">{busy ? "Saving…" : "Save reviewed quote"}</Button>{inquiry.quote_summary && <><span data-testid={`quote-total-${id}`} className="font-mono text-sm">{formatCurrency(inquiry.quote_summary.total_eur)} · valid to {inquiry.quote_summary.valid_until}</span><Button data-testid={`quote-pdf-${id}`} variant="outline" type="button" onClick={download}>Download saved proposal PDF</Button></>}</div>
+    <div className="flex flex-wrap gap-3 items-center"><Button data-testid={`quote-save-${id}`} disabled={!approved || busy} type="submit">{busy ? "Saving…" : "Save reviewed quote"}</Button>{inquiry.quote_summary && <><span data-testid={`quote-total-${id}`} className="font-mono text-sm">{new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR" }).format(inquiry.quote_summary.total_eur)} · valid to {inquiry.quote_summary.valid_until}</span><Button data-testid={`quote-pdf-${id}`} variant="outline" type="button" onClick={download}>Download saved proposal PDF</Button></>}</div>
   </form>;
 };

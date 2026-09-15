@@ -155,6 +155,12 @@ class PackageSnapshot(BaseModel):
             expected = [d.id for d in self.destinations for _ in range(d.days)]
             if [day.destination_id for day in self.itinerary] != expected or [day.day for day in self.itinerary] != list(range(1, self.total_days + 1)):
                 raise ValueError("The itinerary must cover every selected day in chapter order")
+            for day in self.itinerary:
+                destination = next(d for d in self.destinations if d.id == day.destination_id)
+                if day.destination != destination.name or day.accommodation != destination.accommodation:
+                    raise ValueError("Daily destination and stay labels must match the selected chapter")
+                if day.overnight != (day.day < self.total_days):
+                    raise ValueError("The complete trip must account for each overnight stay")
         return self
 
 

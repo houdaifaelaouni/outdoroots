@@ -142,4 +142,8 @@ test_plan:
   test_priority: high_first
 agent_communication:
   - agent: main
+
+  - agent: main
+    message: Iteration1 backend27/27 + frontend smoke passed; testing agent fixed ReportLab canvas issue. Main replaced direct private-canv assignment with supported wrapOn API, compacted PDF to highlights for long trips, added quote category summaries, precise reviewed EUR totals, daily label/night validation, localized missing stays, moved test credentials to env. Need full desktop+mobile frontend E2E and actual PDF page-count/privacy/legibility checks; previous agent did NOT do these. No additional auth implementation changes.
+
     message: Backend dependency restored, all approved feature components implemented. One smoke screenshot passed. No email integration/config added. Existing auth is Bearer localStorage (not cookies); use memory/test_credentials.md. Please test full approved plan, create pytest regression tests, validate PDFs as one page and no private data, clean only your own QA-created records after testing. Earlier legacy components remain unused but not part of active visitor route.

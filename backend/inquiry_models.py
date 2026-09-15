@@ -91,6 +91,6 @@ class ReviewedQuote(BaseModel):
             "inclusions": self.inclusions,
             "exclusions": self.exclusions,
             "outstanding_checks": self.outstanding_checks,
-            "lines": [{"description": line.description, "basis": line.basis, "quantity": line.quantity,
+            "lines": [{"description": line.description, "category": line.category, "basis": line.basis, "quantity": line.quantity,
                        "total_eur": round(line.unit_sell() * line.quantity / self.clp_per_eur, 2)} for line in self.lines],
         }

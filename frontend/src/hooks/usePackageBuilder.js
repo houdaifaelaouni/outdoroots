@@ -74,7 +74,7 @@ export function usePackageBuilder() {
   const grandTotal = subtotal + tax;
   const totalDays = selectedDestinations.reduce((s, d) => s + d.days, 0);
   const totalActivities = breakdown.reduce((s, d) => s + d.activities.length, 0);
-  const itinerary = useMemo(() => composeItinerary(breakdown, startDate), [breakdown, startDate]);
+  const itinerary = useMemo(() => composeItinerary(breakdown, startDate, language), [breakdown, startDate, language]);
   const dateMismatch = Boolean(endDate && itinerary.days.length && startDate &&
     format(endDate, "yyyy-MM-dd") !== itinerary.days[itinerary.days.length - 1].date);
 
