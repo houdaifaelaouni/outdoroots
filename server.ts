@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import PDFDocument from "pdfkit";
 import dotenv from "dotenv";
-import { createBookingStore, BookingStore } from "./store";
+import { createBookingStore, BookingStore } from "./store.js";
 
 dotenv.config();
 
@@ -133,6 +133,19 @@ const seedBookings: Booking[] = [
 ];
 
 let store: BookingStore;
+let storePromise: Promise<BookingStore> | null = null;
+
+// Connect lazily so this works both as a long-running server and as a
+// serverless function; a failed connection is retried on the next request.
+function getStore(): Promise<BookingStore> {
+  if (!storePromise) {
+    storePromise = createBookingStore(seedBookings).catch((err) => {
+      storePromise = null;
+      throw err;
+    });
+  }
+  return storePromise;
+}
 
 // Helper: auth verification
 function authenticateAdmin(req: Request, res: Response, next: NextFunction) {
@@ -165,6 +178,14 @@ const wrap =
 
 // ---------------- API Routes ----------------
 const api = express.Router();
+
+api.use(
+  "/bookings",
+  wrap(async (_req, _res, next) => {
+    store = await getStore();
+    next();
+  })
+);
 
 api.get("/", (_req: Request, res: Response) => {
   res.json({ message: "Outdooroots inquiry API" });
@@ -643,7 +664,6 @@ app.use("/api", (err: any, _req: Request, res: Response, _next: NextFunction) =>
 
 // ---------------- Frontend & Vite Setup ----------------
 async function startServer() {
-  store = await createBookingStore(seedBookings);
   const isProd = process.env.NODE_ENV === "production";
 
   if (!isProd) {
@@ -666,7 +686,10 @@ async function startServer() {
   });
 }
 
-startServer().catch((err) => {
+export default app;
+
+// On Vercel the app is imported by api/index.ts; elsewhere run a normal server.
+if (!process.env.VERCEL) startServer().catch((err) => {
   console.error("Failed to start server:", err);
   process.exit(1);
 });
