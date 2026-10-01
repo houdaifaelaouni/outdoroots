@@ -1,63 +1,192 @@
-import { useEffect } from "react";
-import Lenis from "lenis";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, Globe, MessageCircle, ArrowRight } from "lucide-react";
+import { useLocale } from "@/hooks/useLocale";
 import { OutdoorootsHero } from "@/components/OutdoorootsHero";
 import { StartJourneys, RegionGallery } from "@/components/StartJourneys";
 import { OutdoorootsBuilder } from "@/components/OutdoorootsBuilder";
-import { useLocale } from "@/hooks/useLocale";
-import { usePackageBuilder } from "@/hooks/usePackageBuilder";
-import { formatCurrency } from "@/data/destinations";
+import { usePackageBuilder as useBuilder } from "@/hooks/usePackageBuilder";
+import { IMAGES } from "@/data/destinations";
 
 export default function Home() {
-  const builder = usePackageBuilder();
   const { t, language, setLanguage } = useLocale();
-  const start = (type) => {
-    if (type !== "signature") builder.setBrief((prev) => ({ ...prev, trip_type: type }));
-    document.getElementById(type === "signature" ? "signature-journeys" : "builder")?.scrollIntoView({ behavior: "smooth" });
-  };
+  const builder = useBuilder();
+  const [mobileMenu, setMobileMenu] = useState(false);
+  const builderRef = useRef(null);
 
-  useEffect(() => {
-    const lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
-    let rafId;
-    const raf = (time) => {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    };
-    rafId = requestAnimationFrame(raf);
-    return () => {
-      cancelAnimationFrame(rafId);
-      lenis.destroy();
-    };
-  }, []);
-
-  const handleExplore = (destId) => {
-    builder.setActiveTab(destId);
-    const sel = builder.selectedDestinations.find((d) => d.id === destId);
-    if (sel && sel.days === 0) builder.handleDaysChange(destId, 3);
-    document.getElementById("builder")?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBuilder = (mode) => {
+    if (mode === "signature") {
+      document.getElementById("signature-journeys")?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      setTimeout(() => document.getElementById("builder")?.scrollIntoView({ behavior: "smooth" }), 100);
+    }
   };
 
   return (
-    <div id="top" data-testid="home-page" className="min-h-screen bg-[#FDFBF7]">
-      <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-[#FDFBF7]/80 border-b border-[#E6DFD5]/70">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 h-16 flex items-center justify-between">
-          <a href="#top" data-testid="nav-logo" className="font-serif text-2xl tracking-tight text-[#0B192C]">Outdooroots</a>
-          <nav className="flex items-center gap-3 sm:gap-6 text-xs text-[#5C656E]">
-            <a href="#builder" data-testid="nav-builder-link" className="hidden sm:block hover:text-[#0B192C]">{t("Design a trip", "Diseña tu viaje")}</a>
-            <span data-testid="nav-price-badge" className="hidden md:block">EUR · {builder.brief.trip_type === "group" || !builder.grandTotal ? t("Quote required", "Cotización requerida") : formatCurrency(builder.grandTotal)}</span>
-            <div className="flex gap-1" aria-label="Language"><button data-testid="language-toggle-en" aria-pressed={language === "en"} onClick={() => setLanguage("en")} className={`px-2 py-2 rounded ${language === "en" ? "bg-[#0B192C] text-white" : "hover:bg-[#F6F2EB]"}`}>EN</button><button data-testid="language-toggle-es" aria-pressed={language === "es"} onClick={() => setLanguage("es")} className={`px-2 py-2 rounded ${language === "es" ? "bg-[#0B192C] text-white" : "hover:bg-[#F6F2EB]"}`}>ES</button></div>
-            <Link to="/admin" data-testid="nav-admin-link" className="hover:underline">{t("Team", "Equipo")}</Link>
+    <div data-testid="home-page" className="min-h-screen bg-[#090A0C] text-white">
+      {/* Header */}
+      <header data-testid="main-header" className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-[#090A0C]/85 border-b border-[#262B35]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-lg font-extrabold tracking-tight uppercase text-white" data-testid="brand-name">
+              Outdooroots
+            </span>
+            <span className="hidden sm:block font-mono text-[9px] tracking-[.14em] uppercase text-[#9EA6B5]">
+              Aventura · Vida · Naturaleza
+            </span>
+          </div>
+
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="#signature-journeys" data-testid="nav-journeys-link" className="text-sm text-[#9EA6B5] hover:text-white transition-colors">
+              {t("Journeys", "Viajes")}
+            </a>
+            <a href="#builder" data-testid="nav-builder-link" className="text-sm text-[#9EA6B5] hover:text-white transition-colors">
+              {t("Trip Builder", "Creador de Viaje")}
+            </a>
+            <Link to="/chat" data-testid="nav-chat-link" className="text-sm text-[#9EA6B5] hover:text-white transition-colors">
+              {t("AI Assistant", "Asistente IA")}
+            </Link>
+            <button
+              data-testid="lang-toggle"
+              onClick={() => setLanguage(language === "en" ? "es" : "en")}
+              className="inline-flex items-center gap-1.5 text-sm text-[#9EA6B5] hover:text-white transition-colors"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              {language === "en" ? "ES" : "EN"}
+            </button>
+            <button
+              data-testid="nav-cta"
+              onClick={() => scrollToBuilder("personal")}
+              className="px-5 py-2 bg-[#FF3B30] text-white text-xs font-semibold uppercase tracking-wider rounded-lg hover:bg-[#E02E24] transition-colors"
+            >
+              {t("Plan Trip", "Planear Viaje")}
+            </button>
           </nav>
+
+          <button
+            data-testid="mobile-menu-toggle"
+            className="md:hidden text-white"
+            onClick={() => setMobileMenu(!mobileMenu)}
+          >
+            {mobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
+
+        <AnimatePresence>
+          {mobileMenu && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden border-t border-[#262B35] bg-[#090A0C]/95 backdrop-blur-md overflow-hidden"
+            >
+              <nav className="flex flex-col gap-1 px-4 py-4">
+                <a href="#signature-journeys" onClick={() => setMobileMenu(false)} className="py-3 text-sm text-[#9EA6B5] hover:text-white">
+                  {t("Journeys", "Viajes")}
+                </a>
+                <a href="#builder" onClick={() => setMobileMenu(false)} className="py-3 text-sm text-[#9EA6B5] hover:text-white">
+                  {t("Trip Builder", "Creador de Viaje")}
+                </a>
+                <Link to="/chat" className="py-3 text-sm text-[#9EA6B5] hover:text-white">
+                  {t("AI Assistant", "Asistente IA")}
+                </Link>
+                <button onClick={() => setLanguage(language === "en" ? "es" : "en")} className="py-3 text-sm text-left text-[#9EA6B5] hover:text-white">
+                  {language === "en" ? "Cambiar a Espanol" : "Switch to English"}
+                </button>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
-      <OutdoorootsHero onStart={start} />
-      <StartJourneys builder={builder} />
-      <RegionGallery onExplore={handleExplore} />
-      <OutdoorootsBuilder builder={builder} />
+      {/* Hero */}
+      <OutdoorootsHero onStart={scrollToBuilder} />
 
-      <footer data-testid="footer" className="bg-[#0B192C] text-[#FDFBF7] mt-16">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 py-20"><p className="eyebrow text-[#D4A373] mb-6">Aventura · Vida · Naturaleza</p><div className="font-serif text-5xl sm:text-7xl">En un nuevo viaje.</div><div className="mt-12 border-t border-white/20 pt-7 flex flex-wrap gap-6 justify-between"><span className="font-serif text-2xl">Outdooroots</span><p className="text-sm text-white/65 max-w-lg">{t("Personalized adventures in Chile. Every route, supplier and price is reviewed before a reservation is agreed.", "Aventuras personalizadas en Chile. Cada ruta, proveedor y precio se revisa antes de acordar una reserva.")}</p><a href="#builder" data-testid="footer-contact" className="text-sm underline">{t("Tell us your idea", "Cuéntanos tu idea")}</a></div></div>
+      {/* Destinations */}
+      <RegionGallery onExplore={(id) => { builder.setActiveTab(id); scrollToBuilder("personal"); }} />
+
+      {/* Signature Journeys */}
+      <StartJourneys builder={builder} />
+
+      {/* CTA Section */}
+      <section className="py-24 bg-[#090A0C]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
+          <div className="relative rounded-2xl overflow-hidden">
+            <img src={IMAGES.atacama} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-[#090A0C]/75" />
+            <div className="relative px-8 sm:px-16 py-16 sm:py-24 text-center">
+              <span className="eyebrow mb-4 block">{t("Ready to go?", "Listo para partir?")}</span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase tracking-tight text-white max-w-2xl mx-auto">
+                {t("Talk to our AI travel assistant", "Habla con nuestro asistente de viaje IA")}
+              </h2>
+              <p className="mt-4 text-sm text-white/60 max-w-lg mx-auto">
+                {t(
+                  "Get instant advice on destinations, seasons, routes and what to expect. No commitment — just good answers.",
+                  "Obtene consejos sobre destinos, temporadas, rutas y que esperar. Sin compromiso, solo buenas respuestas."
+                )}
+              </p>
+              <Link
+                to="/chat"
+                data-testid="cta-chat-link"
+                className="inline-flex items-center gap-2 mt-8 px-8 py-3.5 bg-[#FF3B30] text-white text-sm font-semibold uppercase tracking-wider rounded-lg hover:bg-[#E02E24] transition-colors"
+              >
+                <MessageCircle className="w-4 h-4" />
+                {t("Start Chatting", "Empezar a Chatear")}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Builder */}
+      <div ref={builderRef}>
+        <OutdoorootsBuilder builder={builder} />
+      </div>
+
+      {/* Footer */}
+      <footer data-testid="main-footer" className="border-t border-[#262B35] bg-[#090A0C]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-16">
+          <div className="flex flex-col sm:flex-row items-start justify-between gap-8">
+            <div>
+              <span className="text-lg font-extrabold tracking-tight uppercase text-white">Outdooroots</span>
+              <p className="font-mono text-[10px] tracking-[.14em] uppercase text-[#9EA6B5] mt-1">
+                Aventura · Vida · Naturaleza
+              </p>
+              <p className="text-xs text-[#9EA6B5]/60 mt-4 max-w-xs leading-relaxed">
+                {t(
+                  "Inquiry-based adventure travel in Chile. Proposals reviewed by our team — nothing is confirmed until we talk.",
+                  "Viajes de aventura basados en consultas en Chile. Propuestas revisadas por nuestro equipo — nada se confirma hasta conversar."
+                )}
+              </p>
+            </div>
+            <div className="flex gap-12 text-sm">
+              <div className="space-y-3">
+                <p className="font-mono text-[10px] tracking-widest uppercase text-[#FF3B30]">{t("Explore", "Explorar")}</p>
+                <a href="#signature-journeys" className="block text-[#9EA6B5] hover:text-white transition-colors">{t("Journeys", "Viajes")}</a>
+                <a href="#builder" className="block text-[#9EA6B5] hover:text-white transition-colors">{t("Trip Builder", "Creador de Viaje")}</a>
+                <Link to="/chat" className="block text-[#9EA6B5] hover:text-white transition-colors">{t("AI Assistant", "Asistente IA")}</Link>
+              </div>
+              <div className="space-y-3">
+                <p className="font-mono text-[10px] tracking-widest uppercase text-[#FF3B30]">{t("Regions", "Regiones")}</p>
+                <span className="block text-[#9EA6B5]">Patagonia</span>
+                <span className="block text-[#9EA6B5]">Atacama</span>
+                <span className="block text-[#9EA6B5]">Santiago</span>
+                <span className="block text-[#9EA6B5]">Easter Island</span>
+                <span className="block text-[#9EA6B5]">Lake District</span>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-[#262B35] mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-[#9EA6B5]/50">
+              {t(
+                "Prices are illustrative estimates in EUR. Not a reservation system.",
+                "Precios son estimaciones ilustrativas en EUR. No es un sistema de reservas."
+              )}
+            </p>
+            <p className="text-xs text-[#9EA6B5]/50">Outdooroots {new Date().getFullYear()}</p>
+          </div>
+        </div>
       </footer>
     </div>
   );

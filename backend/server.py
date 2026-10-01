@@ -1,4 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Header, Depends, Response
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from itinerary_pdf import render_itinerary_pdf
 from inquiry_models import AdventureBrief, InquiryUpdate, ReviewedQuote
 from dotenv import load_dotenv
@@ -280,7 +282,9 @@ async def startup():
     await seed_admin()
 
 
+from chat import router as chat_router
 app.include_router(api_router)
+app.include_router(chat_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -292,6 +296,22 @@ app.add_middleware(
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
+# Serve React frontend static build in production
+STATIC_DIR = ROOT_DIR / "static"
+if STATIC_DIR.is_dir():
+    @app.get("/")
+    async def serve_index():
+        return FileResponse(str(STATIC_DIR / "index.html"))
+
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR / "static")), name="frontend-static")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        file_path = STATIC_DIR / full_path
+        if file_path.is_file():
+            return FileResponse(str(file_path))
+        return FileResponse(str(STATIC_DIR / "index.html"))
 
 
 @app.on_event("shutdown")

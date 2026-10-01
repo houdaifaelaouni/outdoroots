@@ -1,8 +1,97 @@
 import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight, MapPin, Compass } from "lucide-react";
 import { IMAGES } from "@/data/destinations";
 import { useLocale } from "@/hooks/useLocale";
+
 export const OutdoorootsHero = ({ onStart }) => {
   const { t } = useLocale();
-  return <section data-testid="hero-section" className="relative min-h-[88vh] flex items-end bg-[#0B192C] text-[#FDFBF7] overflow-hidden"><img src={IMAGES.hero} alt={t("Glacial wilderness in Patagonia", "Paisaje glaciar de la Patagonia")} className="absolute inset-0 w-full h-full object-cover opacity-45" /><div className="relative max-w-7xl mx-auto w-full px-5 sm:px-8 pt-40 pb-14"><motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="font-mono text-xs tracking-[0.25em] uppercase text-[#D4A373] mb-7">Aventura · Vida · Naturaleza</motion.p><motion.h1 initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9 }} className="font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.08] max-w-3xl">{t("Take the path that", "Elige el camino que")}<br /><em className="text-[#D4A373]">{t("feels like you.", "va contigo.")}</em></motion.h1><p className="mt-7 text-sm sm:text-base text-white/80 max-w-xl leading-relaxed">{t("Personalized outdoor adventures, rooted in Chile's nature and local life. From a day beyond the city to a journey into the wild — let's design it together.", "Aventuras al aire libre conectadas con la naturaleza y la vida local de Chile. Desde un día fuera de la ciudad hasta un viaje hacia lo desconocido: diseñémoslo juntos.")}</p><div className="grid sm:grid-cols-3 gap-4 mt-12 border-t border-white/25 pt-6">{[["signature", "Explore a signature journey", "Explorar un viaje de autor", "A thoughtful place to start", "Una idea para comenzar"], ["personal", "Design a personal adventure", "Diseñar mi aventura", "Day trips, weekends, wide horizons", "Excursiones, escapadas y horizontes"], ["group", "Plan a group experience", "Planificar una experiencia grupal", "Shared purpose. A journey together.", "Un propósito compartido. Un viaje juntos."]].map(([id, en, es, sub, subEs], i) => <button data-testid={`start-${id}`} key={id} onClick={() => onStart(id)} className="group text-left py-4 hover:text-[#D4A373] transition-colors"><span className="font-mono text-[10px] text-[#D4A373]">0{i + 1}</span><span className="flex justify-between items-center gap-2 mt-2 text-sm">{t(en, es)}<ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-1" /></span><span className="block text-xs text-white/60 mt-2">{t(sub, subEs)}</span></button>)}</div></div></section>;
+  return (
+    <section data-testid="hero-section" className="relative min-h-screen flex items-end overflow-hidden">
+      <img
+        src={IMAGES.hero}
+        alt={t("Torres del Paine expedition", "Expedicion Torres del Paine")}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#090A0C] via-[#090A0C]/50 to-[#090A0C]/20" />
+
+      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pb-16 sm:pb-24 pt-40">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#FF3B30]/30 bg-[#FF3B30]/10 backdrop-blur-sm mb-8"
+        >
+          <MapPin className="w-3.5 h-3.5 text-[#FF3B30]" />
+          <span className="font-mono text-[10px] tracking-widest uppercase text-[#FF3B30]">
+            {t("Chile Expedition Designers", "Disenadores de Expediciones en Chile")}
+          </span>
+        </motion.div>
+
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight uppercase leading-[0.95] text-white max-w-4xl"
+        >
+          {t("Explore Chile's", "Descubre la")}
+          <br />
+          <span className="text-[#FF3B30]">{t("Wild Nature", "Naturaleza Salvaje")}</span>
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="mt-6 text-base sm:text-lg text-white/70 max-w-xl leading-relaxed"
+        >
+          {t(
+            "Custom expedition itineraries through Patagonia, Atacama, Easter Island & beyond. Designed by locals, built for adventurers.",
+            "Itinerarios de expedicion a medida por Patagonia, Atacama, Isla de Pascua y mas. Disenados por locales, creados para aventureros."
+          )}
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="flex flex-wrap gap-4 mt-10"
+        >
+          <button
+            data-testid="hero-cta-primary"
+            onClick={() => onStart("personal")}
+            className="group inline-flex items-center gap-2 px-7 py-3.5 bg-[#FF3B30] text-white text-sm font-semibold uppercase tracking-wider rounded-lg hover:bg-[#E02E24] transition-colors"
+          >
+            {t("Design My Trip", "Disenar Mi Viaje")}
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </button>
+          <button
+            data-testid="hero-cta-secondary"
+            onClick={() => onStart("signature")}
+            className="inline-flex items-center gap-2 px-7 py-3.5 border border-white/25 text-white text-sm font-semibold uppercase tracking-wider rounded-lg hover:bg-white/10 backdrop-blur-sm transition-colors"
+          >
+            <Compass className="w-4 h-4" />
+            {t("Explore Journeys", "Explorar Viajes")}
+          </button>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="grid grid-cols-3 gap-6 mt-16 pt-8 border-t border-white/15 max-w-lg"
+        >
+          {[
+            [t("5 Regions", "5 Regiones"), t("Coast to peaks", "Costa a cumbres")],
+            [t("Custom Routes", "Rutas a Medida"), t("Your pace, your way", "Tu ritmo, tu estilo")],
+            [t("Local Experts", "Expertos Locales"), t("On-ground knowledge", "Conocimiento real")],
+          ].map(([title, sub]) => (
+            <div key={title}>
+              <p className="text-sm font-semibold text-white">{title}</p>
+              <p className="text-xs text-white/50 mt-1">{sub}</p>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
 };

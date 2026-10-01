@@ -20,39 +20,239 @@ export const OutdoorootsBuilder = ({ builder: b }) => {
   const [reference, setReference] = useState(null);
   const group = b.brief.trip_type === "group";
   const amount = b.brief.budget_basis === "total" ? b.grandTotal : b.grandTotal / b.travelers;
+
   const exportPdf = async () => {
     setDownloading(true);
     try {
-      const payload = b.buildPayload(); delete payload.contact;
+      const payload = b.buildPayload();
+      delete payload.contact;
       const { data } = await axios.post(`${API}/itinerary/pdf`, payload, { responseType: "blob" });
-      const url = URL.createObjectURL(data); const a = document.createElement("a"); a.href = url; a.download = "outdooroots-itinerary.pdf"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-      toast.success(t("Your one-page journey is ready", "Tu resumen de viaje está listo"));
-    } catch { toast.error(t("PDF couldn't be created. Your ideas are safe; please try again.", "No se pudo crear el PDF. Tus ideas están guardadas en esta página; inténtalo de nuevo.")); }
-    finally { setDownloading(false); }
+      const url = URL.createObjectURL(data);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "outdooroots-itinerary.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      toast.success(t("Your one-page journey is ready", "Tu resumen de viaje esta listo"));
+    } catch {
+      toast.error(t("PDF couldn't be created. Please try again.", "No se pudo crear el PDF. Intentalo de nuevo."));
+    } finally {
+      setDownloading(false);
+    }
   };
+
   const submit = async (event) => {
-    event.preventDefault(); b.setSubmitting(true); setReference(null);
-    try { const { data } = await axios.post(`${API}/bookings`, b.buildPayload()); setReference(data.reference || data.id); }
-    catch (e) { toast.error(t("We couldn't save your inquiry. Please check the details and try again.", "No pudimos guardar tu consulta. Revisa los datos e inténtalo de nuevo.")); }
-    finally { b.setSubmitting(false); }
+    event.preventDefault();
+    b.setSubmitting(true);
+    setReference(null);
+    try {
+      const { data } = await axios.post(`${API}/bookings`, b.buildPayload());
+      setReference(data.reference || data.id);
+    } catch {
+      toast.error(t("Couldn't save your inquiry. Please try again.", "No pudimos guardar tu consulta. Intentalo de nuevo."));
+    } finally {
+      b.setSubmitting(false);
+    }
   };
-  return <section id="builder" data-testid="builder-section" className="max-w-7xl mx-auto px-5 sm:px-8 py-20 scroll-mt-20">
-    <div className="mb-12 max-w-2xl"><p className="eyebrow mb-4">{t("The trip-design workspace", "Tu espacio para diseñar viajes")}</p><h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl">{t("An adventure with your name on it.", "Una aventura que lleva tu nombre.")}</h1><p className="mt-5 text-sm text-[#5C656E] leading-relaxed">{t("A starting idea is enough. Tell us what moves you; together we'll turn it into a considered proposal.", "Una idea es suficiente. Cuéntanos qué te inspira y juntos la convertiremos en una propuesta a tu medida.")}</p></div>
-    <div className="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-9 items-start"><div className="min-w-0"><AdventureBrief builder={b} /><Recommendations builder={b} /><RouteDesigner builder={b} /><JourneyTimeline builder={b} /></div>
-      <aside className="space-y-5">
-        <div className="rounded-xl border border-[#E6DFD5] bg-white p-6" data-testid="package-summary-card"><p className="eyebrow mb-4">{t("Your field notes", "Tu cuaderno de viaje")}</p><BriefField id="package-name-input" label={t("Name your journey", "Nombra tu viaje")}><Input data-testid="package-name-input" id="package-name-input" value={b.packageName} maxLength={120} placeholder={t("My Outdooroots adventure", "Mi aventura Outdooroots")} onChange={(e) => b.setPackageName(e.target.value)} /></BriefField>
-          <div className="grid grid-cols-3 gap-2 my-6 text-center">{[[b.totalDays, t("days", "días"), "summary-total-days"], [Math.max(0, b.totalDays - 1), t("nights", "noches"), "summary-total-nights"], [b.travelers, t("travelers", "viajeros"), "summary-travelers"]].map(([value, label, id]) => <div key={id}><p data-testid={id} className="font-serif text-3xl">{value}</p><p className="text-[10px] uppercase text-[#5C656E]">{label}</p></div>)}</div>
-          <div className="space-y-4 mb-6">{b.breakdown.map((d) => <div key={d.id} data-testid={`summary-destination-${d.id}`} className="border-t border-[#E6DFD5] pt-3"><p className="text-sm font-medium">{d.name}</p><p className="text-xs text-[#5C656E] mt-1">{d.days} {t("days", "días")} · {d.nights} {t("nights", "noches")} · {d.activities.length} {t("experiences", "experiencias")}</p><p className="text-xs mt-2">{t("Experiences / guides", "Experiencias / guías")}: {group ? t("quote required", "cotización requerida") : formatCurrency(d.activitiesCost)}</p><p className="text-xs mt-1">{t("Stays", "Alojamientos")}: {group || (!d.accommodation && d.nights > 0) ? t("quote required", "cotización requerida") : formatCurrency(d.accommodationCost)}</p></div>)}</div>
-          <div className="bg-[#0B192C] text-white rounded-lg p-5"><p data-testid="estimate-label" className="font-mono uppercase text-[9px] tracking-widest">{t("Illustrative estimate · EUR", "Estimación ilustrativa · EUR")}</p><p data-testid="grand-total-display" className="font-serif text-3xl mt-2">{group || !b.grandTotal ? t("Quote required", "Cotización requerida") : formatCurrency(b.grandTotal)}</p>{!group && b.grandTotal > 0 && <p data-testid="per-person-estimate" className="text-xs mt-2 opacity-80">{formatCurrency(b.grandTotal / b.travelers)} / {t("person", "persona")} · {b.travelers} {t("travelers", "viajeros")}</p>}</div>
-          <p data-testid="estimate-disclaimer" className="text-xs text-[#5C656E] mt-4 leading-relaxed">{t("Example rates, not approved commercial prices. Only priced experiences and proposed nights are counted. Flights, transport and missing prices need a quote. No automatic tax or service charge. Lodge inclusions must be reviewed before pricing.", "Tarifas de ejemplo, no precios comerciales aprobados. Solo se suman experiencias y noches con precio. Vuelos, transporte e importes faltantes requieren cotización. Sin impuestos ni cargos automáticos. Se revisarán las inclusiones del alojamiento.")}</p>
-          {!group && b.brief.budget != null && <p data-testid="budget-comparison" className="planning-note mt-4">{amount > b.brief.budget ? t("The priced portion already exceeds your stated budget.", "La parte con precio ya supera tu presupuesto.") : t("The priced portion is within your stated budget, but unpriced items may increase the total.", "La parte con precio está dentro del presupuesto, pero faltan conceptos por cotizar.")}</p>}
-          <Button data-testid="export-pdf-button" variant="outline" disabled={downloading} onClick={exportPdf} className="w-full mt-5"><Download className="w-4 h-4 mr-2" />{downloading ? t("Typesetting…", "Preparando…") : t("Download one-page PDF", "Descargar resumen PDF")}</Button>
-          <Button data-testid="request-proposal-button" onClick={() => { setReady(true); setTimeout(() => { document.getElementById("proposal-contact")?.scrollIntoView({ behavior: "smooth", block: "start" }); document.getElementById("contact-name-input")?.focus({ preventScroll: true }); }, 100); }} className="w-full mt-3 h-auto py-3 whitespace-normal">{t("Request my adventure proposal", "Solicitar mi propuesta de aventura")}<ArrowUpRight className="w-4 h-4 ml-2 shrink-0" /></Button>
-          <div className="flex justify-between gap-2 mt-4"><button data-testid="load-sample-button" className="text-xs underline text-[#5C656E]" onClick={b.loadSample}>{t("Try all five chapters", "Probar los cinco capítulos")}</button><button data-testid="reset-button" className="text-xs underline text-[#5C656E]" onClick={() => { b.reset(); setReference(null); }}>{t("Reset route", "Reiniciar ruta")}</button></div>
+
+  return (
+    <section id="builder" data-testid="builder-section" className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-24 scroll-mt-20">
+      <div className="mb-14 max-w-2xl">
+        <span className="eyebrow mb-3 block">{t("Trip Builder", "Creador de Viaje")}</span>
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight uppercase text-white leading-[0.95]">
+          {t("Design Your Expedition", "Disena Tu Expedicion")}
+        </h1>
+        <p className="mt-5 text-sm text-[#9EA6B5] leading-relaxed">
+          {t(
+            "A starting idea is enough. Tell us what moves you; together we'll turn it into a considered proposal.",
+            "Una idea es suficiente. Cuentanos que te inspira y juntos la convertiremos en una propuesta a tu medida."
+          )}
+        </p>
+      </div>
+
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-8 items-start">
+        <div className="min-w-0">
+          <AdventureBrief builder={b} />
+          <Recommendations builder={b} />
+          <RouteDesigner builder={b} />
+          <JourneyTimeline builder={b} />
         </div>
-        {ready && <form id="proposal-contact" data-testid="proposal-contact-form" onSubmit={submit} className="bg-[#F6F2EB] p-6 rounded-xl border border-[#E6DFD5] space-y-4 scroll-mt-24"><h2 className="font-serif text-lg">{t("Let's make it yours.", "Hagámoslo a tu medida.")}</h2>{[["name", t("Full name", "Nombre completo"), "text"], ["email", t("Email", "Correo electrónico"), "email"], ["phone", t("Phone (optional)", "Teléfono (opcional)"), "tel"]].map(([key, label, type]) => <BriefField key={key} id={`contact-${key}-input`} label={label}><Input data-testid={`contact-${key}-input`} id={`contact-${key}-input`} type={type} required={key !== "phone"} maxLength={200} value={b.contactInfo[key]} onChange={(e) => b.setContactInfo({ ...b.contactInfo, [key]: e.target.value })} /></BriefField>)}<BriefField id="contact-notes-input" label={t("Anything else? (optional)", "¿Algo más? (opcional)")}><Textarea data-testid="contact-notes-input" id="contact-notes-input" value={b.contactInfo.notes} maxLength={2000} onChange={(e) => b.setContactInfo({ ...b.contactInfo, notes: e.target.value })} /></BriefField><p className="text-xs leading-relaxed text-[#5C656E]">{t("This is an inquiry, not a reservation. Your details are used to review and respond to your request. No marketing enrollment or automated email.", "Esto es una consulta, no una reserva. Usamos tus datos para revisar y responder a tu solicitud. Sin inscripción comercial ni correos automáticos.")}</p><Button data-testid="submit-booking-button" type="submit" disabled={b.submitting} className="w-full h-auto py-3 whitespace-normal">{b.submitting ? t("Saving inquiry…", "Guardando consulta…") : t("Send for team review", "Enviar para revisión del equipo")}</Button></form>}
-        {reference && <div data-testid="inquiry-confirmation" role="status" className="rounded-xl p-6 bg-[#EEFAF4] text-[#0F5132]"><h2 className="font-serif text-lg">{t("Your adventure starts here.", "Tu aventura empieza aquí.")}</h2><p data-testid="inquiry-reference" className="font-mono text-xs my-3 break-all">{reference}</p><p className="text-sm">{t("Your request is saved. The Outdooroots team will review your ideas and outstanding planning items. Keep this reference; nothing has been reserved.", "Tu solicitud está guardada. El equipo Outdooroots revisará tus ideas y los detalles pendientes. Conserva esta referencia; no se ha reservado ningún servicio.")}</p></div>}
-      </aside>
-    </div>
-  </section>;
+
+        <aside className="space-y-5">
+          {/* Package summary card */}
+          <div className="rounded-xl border border-[#262B35] bg-[#181B22] p-6" data-testid="package-summary-card">
+            <p className="eyebrow mb-4">{t("Your Field Notes", "Tu Cuaderno de Viaje")}</p>
+
+            <BriefField id="package-name-input" label={t("Name your journey", "Nombra tu viaje")}>
+              <Input
+                data-testid="package-name-input"
+                id="package-name-input"
+                value={b.packageName}
+                maxLength={120}
+                placeholder={t("My Outdooroots expedition", "Mi expedicion Outdooroots")}
+                onChange={(e) => b.setPackageName(e.target.value)}
+                className="bg-[#20252E] border-[#262B35] text-white placeholder:text-[#9EA6B5]/40 focus:border-[#FF3B30]/50"
+              />
+            </BriefField>
+
+            <div className="grid grid-cols-3 gap-2 my-6 text-center">
+              {[
+                [b.totalDays, t("days", "dias"), "summary-total-days"],
+                [Math.max(0, b.totalDays - 1), t("nights", "noches"), "summary-total-nights"],
+                [b.travelers, t("travelers", "viajeros"), "summary-travelers"],
+              ].map(([value, label, id]) => (
+                <div key={id}>
+                  <p data-testid={id} className="text-3xl font-extrabold text-white">{value}</p>
+                  <p className="font-mono text-[10px] uppercase text-[#9EA6B5] tracking-wider">{label}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-4 mb-6">
+              {b.breakdown.map((d) => (
+                <div key={d.id} data-testid={`summary-destination-${d.id}`} className="border-t border-[#262B35] pt-3">
+                  <p className="text-sm font-semibold text-white uppercase">{d.name}</p>
+                  <p className="text-xs text-[#9EA6B5] mt-1">
+                    {d.days} {t("days", "dias")} · {d.nights} {t("nights", "noches")} · {d.activities.length} {t("experiences", "experiencias")}
+                  </p>
+                  <p className="text-xs text-[#9EA6B5] mt-2">
+                    {t("Experiences", "Experiencias")}: {group ? t("quote required", "cotizacion requerida") : formatCurrency(d.activitiesCost)}
+                  </p>
+                  <p className="text-xs text-[#9EA6B5] mt-1">
+                    {t("Stays", "Alojamientos")}: {group || (!d.accommodation && d.nights > 0) ? t("quote required", "cotizacion requerida") : formatCurrency(d.accommodationCost)}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Estimate */}
+            <div className="bg-[#FF3B30] text-white rounded-lg p-5">
+              <p data-testid="estimate-label" className="font-mono uppercase text-[9px] tracking-widest opacity-80">
+                {t("Illustrative Estimate · EUR", "Estimacion Ilustrativa · EUR")}
+              </p>
+              <p data-testid="grand-total-display" className="text-3xl font-extrabold mt-2">
+                {group || !b.grandTotal ? t("Quote required", "Cotizacion requerida") : formatCurrency(b.grandTotal)}
+              </p>
+              {!group && b.grandTotal > 0 && (
+                <p data-testid="per-person-estimate" className="text-xs mt-2 opacity-80">
+                  {formatCurrency(b.grandTotal / b.travelers)} / {t("person", "persona")} · {b.travelers} {t("travelers", "viajeros")}
+                </p>
+              )}
+            </div>
+
+            <p data-testid="estimate-disclaimer" className="text-xs text-[#9EA6B5]/60 mt-4 leading-relaxed">
+              {t(
+                "Example rates, not approved commercial prices. Flights, transport and missing prices need a quote.",
+                "Tarifas de ejemplo, no precios comerciales aprobados. Vuelos, transporte e importes faltantes requieren cotizacion."
+              )}
+            </p>
+
+            {!group && b.brief.budget != null && (
+              <p data-testid="budget-comparison" className="planning-note mt-4">
+                {amount > b.brief.budget
+                  ? t("The priced portion already exceeds your stated budget.", "La parte con precio ya supera tu presupuesto.")
+                  : t("Within budget, but unpriced items may increase the total.", "Dentro del presupuesto, pero faltan conceptos por cotizar.")}
+              </p>
+            )}
+
+            <button
+              data-testid="export-pdf-button"
+              disabled={downloading}
+              onClick={exportPdf}
+              className="w-full mt-5 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold border border-[#262B35] text-white rounded-lg hover:bg-[#20252E] transition-colors disabled:opacity-40"
+            >
+              <Download className="w-4 h-4" />
+              {downloading ? t("Preparing...", "Preparando...") : t("Download PDF", "Descargar PDF")}
+            </button>
+
+            <button
+              data-testid="request-proposal-button"
+              onClick={() => {
+                setReady(true);
+                setTimeout(() => {
+                  document.getElementById("proposal-contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  document.getElementById("contact-name-input")?.focus({ preventScroll: true });
+                }, 100);
+              }}
+              className="w-full mt-3 inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold bg-[#FF3B30] text-white rounded-lg hover:bg-[#E02E24] transition-colors uppercase tracking-wider"
+            >
+              {t("Request Proposal", "Solicitar Propuesta")}
+              <ArrowUpRight className="w-4 h-4 shrink-0" />
+            </button>
+
+            <div className="flex justify-between gap-2 mt-4">
+              <button data-testid="load-sample-button" className="text-xs text-[#9EA6B5] hover:text-white transition-colors underline" onClick={b.loadSample}>
+                {t("Try all five", "Probar los cinco")}
+              </button>
+              <button data-testid="reset-button" className="text-xs text-[#9EA6B5] hover:text-white transition-colors underline" onClick={() => { b.reset(); setReference(null); }}>
+                {t("Reset route", "Reiniciar ruta")}
+              </button>
+            </div>
+          </div>
+
+          {/* Contact form */}
+          {ready && (
+            <form id="proposal-contact" data-testid="proposal-contact-form" onSubmit={submit} className="bg-[#121418] p-6 rounded-xl border border-[#262B35] space-y-4 scroll-mt-24">
+              <h2 className="text-lg font-bold uppercase tracking-tight text-white">{t("Let's Make It Yours", "Hagamoslo a Tu Medida")}</h2>
+              {[
+                ["name", t("Full name", "Nombre completo"), "text"],
+                ["email", t("Email", "Correo electronico"), "email"],
+                ["phone", t("Phone (optional)", "Telefono (opcional)"), "tel"],
+              ].map(([key, label, type]) => (
+                <BriefField key={key} id={`contact-${key}-input`} label={label}>
+                  <Input
+                    data-testid={`contact-${key}-input`}
+                    id={`contact-${key}-input`}
+                    type={type}
+                    required={key !== "phone"}
+                    maxLength={200}
+                    value={b.contactInfo[key]}
+                    onChange={(e) => b.setContactInfo({ ...b.contactInfo, [key]: e.target.value })}
+                    className="bg-[#20252E] border-[#262B35] text-white placeholder:text-[#9EA6B5]/40 focus:border-[#FF3B30]/50"
+                  />
+                </BriefField>
+              ))}
+              <BriefField id="contact-notes-input" label={t("Anything else?", "Algo mas?")}>
+                <Textarea
+                  data-testid="contact-notes-input"
+                  id="contact-notes-input"
+                  value={b.contactInfo.notes}
+                  maxLength={2000}
+                  onChange={(e) => b.setContactInfo({ ...b.contactInfo, notes: e.target.value })}
+                  className="bg-[#20252E] border-[#262B35] text-white placeholder:text-[#9EA6B5]/40 focus:border-[#FF3B30]/50"
+                />
+              </BriefField>
+              <p className="text-xs leading-relaxed text-[#9EA6B5]/60">
+                {t("This is an inquiry, not a reservation. No marketing enrollment.", "Esto es una consulta, no una reserva. Sin inscripcion comercial.")}
+              </p>
+              <button
+                data-testid="submit-booking-button"
+                type="submit"
+                disabled={b.submitting}
+                className="w-full py-3 text-sm font-semibold bg-[#FF3B30] text-white rounded-lg hover:bg-[#E02E24] transition-colors uppercase tracking-wider disabled:opacity-40"
+              >
+                {b.submitting ? t("Saving...", "Guardando...") : t("Send for Review", "Enviar para Revision")}
+              </button>
+            </form>
+          )}
+
+          {/* Confirmation */}
+          {reference && (
+            <div data-testid="inquiry-confirmation" role="status" className="rounded-xl p-6 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+              <h2 className="text-lg font-bold uppercase tracking-tight">{t("Inquiry Saved", "Consulta Guardada")}</h2>
+              <p data-testid="inquiry-reference" className="font-mono text-xs my-3 break-all text-emerald-300">{reference}</p>
+              <p className="text-sm text-emerald-400/80">
+                {t(
+                  "Your request is saved. The team will review your ideas. Keep this reference; nothing has been reserved.",
+                  "Tu solicitud esta guardada. El equipo revisara tus ideas. Conserva esta referencia; no se ha reservado nada."
+                )}
+              </p>
+            </div>
+          )}
+        </aside>
+      </div>
+    </section>
+  );
 };
