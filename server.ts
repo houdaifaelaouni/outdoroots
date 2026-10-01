@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import PDFDocument from "pdfkit";
 import dotenv from "dotenv";
+import { createBookingStore, BookingStore } from "./store";
 
 dotenv.config();
 
@@ -81,7 +82,8 @@ interface Booking {
   quote_summary?: any;
 }
 
-const bookings: Booking[] = [
+// Sample inquiry, only used when running without a database
+const seedBookings: Booking[] = [
   {
     id: "b1a2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
     reference: "OR-20261001-B1A2C3D4",
@@ -130,6 +132,8 @@ const bookings: Booking[] = [
   },
 ];
 
+let store: BookingStore;
+
 // Helper: auth verification
 function authenticateAdmin(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
@@ -152,6 +156,12 @@ function authenticateAdmin(req: Request, res: Response, next: NextFunction) {
     return res.status(401).json({ detail: "Invalid token" });
   }
 }
+
+// Forward errors from async route handlers to Express (Express 4 doesn't)
+const wrap =
+  (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) =>
+  (req: Request, res: Response, next: NextFunction) =>
+    fn(req, res, next).catch(next);
 
 // ---------------- API Routes ----------------
 const api = express.Router();
@@ -181,7 +191,7 @@ api.get("/auth/me", authenticateAdmin, (req: Request, res: Response) => {
 });
 
 // Bookings
-api.post("/bookings", (req: Request, res: Response) => {
+api.post("/bookings", wrap(async (req: Request, res: Response) => {
   const body = req.body || {};
   if (!body.contact || !body.contact.name || !body.contact.email) {
     return res.status(422).json({ detail: "Please provide valid contact information" });
@@ -199,17 +209,17 @@ api.post("/bookings", (req: Request, res: Response) => {
     created_at: now.toISOString(),
   };
 
-  bookings.unshift(doc);
+  await store.insert(doc);
   res.status(200).json(doc);
-});
+}));
 
-api.get("/bookings", authenticateAdmin, (_req: Request, res: Response) => {
-  res.json(bookings);
-});
+api.get("/bookings", authenticateAdmin, wrap(async (_req: Request, res: Response) => {
+  res.json(await store.list());
+}));
 
-api.patch("/bookings/:id", authenticateAdmin, (req: Request, res: Response) => {
+api.patch("/bookings/:id", authenticateAdmin, wrap(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const booking = bookings.find((b) => b.id === id);
+  const booking = await store.get(id);
   if (!booking) {
     return res.status(404).json({ detail: "Inquiry not found" });
   }
@@ -235,13 +245,13 @@ api.patch("/bookings/:id", authenticateAdmin, (req: Request, res: Response) => {
   }
   changes.updated_at = now;
 
-  Object.assign(booking, changes);
+  await store.update(id, changes);
   res.json({ id, ...changes });
-});
+}));
 
-api.put("/bookings/:id/quote", authenticateAdmin, (req: Request, res: Response) => {
+api.put("/bookings/:id/quote", authenticateAdmin, wrap(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const booking = bookings.find((b) => b.id === id);
+  const booking = await store.get(id);
   if (!booking) {
     return res.status(404).json({ detail: "Inquiry not found" });
   }
@@ -296,11 +306,10 @@ api.put("/bookings/:id/quote", authenticateAdmin, (req: Request, res: Response) 
     reviewed_at: new Date().toISOString(),
   };
 
-  booking.quote = quote;
-  booking.quote_summary = quote_summary;
+  await store.update(id, { quote, quote_summary });
 
   res.json({ quote, quote_summary });
-});
+}));
 
 // PDF Rendering function with PDFKit
 function generateItineraryPDF(pkg: any, reviewed?: any, language = "en"): Promise<Buffer> {
@@ -464,7 +473,7 @@ api.post("/itinerary/pdf", async (req: Request, res: Response) => {
 api.get("/bookings/:id/proposal.pdf", authenticateAdmin, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const booking = bookings.find((b) => b.id === id);
+    const booking = await store.get(id);
     if (!booking) {
       return res.status(404).json({ detail: "Inquiry not found" });
     }
@@ -627,8 +636,14 @@ api.post("/chat", async (req: Request, res: Response) => {
 
 app.use("/api", api);
 
+app.use("/api", (err: any, _req: Request, res: Response, _next: NextFunction) => {
+  console.error("API error:", err);
+  res.status(500).json({ detail: "Something went wrong. Please try again." });
+});
+
 // ---------------- Frontend & Vite Setup ----------------
 async function startServer() {
+  store = await createBookingStore(seedBookings);
   const isProd = process.env.NODE_ENV === "production";
 
   if (!isProd) {

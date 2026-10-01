@@ -17,3 +17,7 @@ services:
         sync: false
       - key: GEMINI_API_KEY
         sync: false
+      - key: MONGO_URL
+        sync: false
+      - key: DB_NAME
+        value: outdooroots
