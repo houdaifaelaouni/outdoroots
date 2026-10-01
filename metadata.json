@@ -1,0 +1,7 @@
+{
+  "name": "Outdooroots",
+  "description": "Personalized outdoor adventures in Chile. Design your journey through nature and local life, then request a considered proposal.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
