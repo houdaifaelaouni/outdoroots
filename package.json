@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build",
-    "start": "node --loader tsx server.ts"
+    "start": "NODE_ENV=production tsx server.ts"
   },
   "dependencies": {
     "@google/genai": "^2.25.0",
@@ -57,6 +57,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.475.0",
     "marked": "^15.0.6",
+    "mongodb": "^6.21.0",
     "next-themes": "^0.4.4",
     "pdfkit": "^0.16.0",
     "react": "^19.0.0",
@@ -95,5 +96,8 @@
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vite": "^6.2.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

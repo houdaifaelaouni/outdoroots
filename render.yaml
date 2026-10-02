@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: outdooroots
+    runtime: node
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: npm start
+    healthCheckPath: /api/
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: MONGO_URL
+        sync: false
+      - key: DB_NAME
+        value: outdooroots
