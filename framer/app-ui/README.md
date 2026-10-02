@@ -17,3 +17,4 @@ control; cards can be bound to CMS fields.
 | `ORJourneyCard.tsx` | Expedition card with tags, duration, region and action |
 | `ORCtaBanner.tsx` | Photo call-to-action banner |
 | `ORFooter.tsx` | Footer with two link columns and legal line |
+| `ORBookingForm.tsx` | 4-step booking request form (dark style); set API URL to save to the backend |
