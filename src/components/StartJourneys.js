@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Clock, Mountain } from "lucide-react";
 import { useLocale } from "@/hooks/useLocale";
-import { destinations, IMAGES } from "@/data/destinations";
+import { destinations, IMAGES, formatCurrency } from "@/data/destinations";
 import { signatureJourneys, regionName } from "@/data/outdooroots";
 
 export const StartJourneys = ({ builder: b }) => {
@@ -93,7 +93,6 @@ export const StartJourneys = ({ builder: b }) => {
 
 export const Recommendations = ({ builder: b }) => {
   const { t, language } = useLocale();
-  const { formatCurrency } = require("@/data/destinations");
   if (!b.brief.interests.length && !b.brief.desired_duration) return null;
   const sorted = [...signatureJourneys].sort((a, z) => {
     const score = (s) =>
